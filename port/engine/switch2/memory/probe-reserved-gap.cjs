@@ -32,6 +32,8 @@ async function main() {
   // copy the trigger source instead of a clone of saved. See docs/SESSION-LAYOUT-PROPOSAL.md.
   const diagSessionLayout = process.env.NS2_DIAG_SESSION_LAYOUT || 'A';
   if (!['A', 'C'].includes(diagSessionLayout)) throw Error('Unsupported session layout ' + diagSessionLayout);
+  if (diagSessionLayout === 'C' && process.env.NS2_DIAG_TRIGGER_SOURCE === 'root')
+    throw Error('Layout C does not support NS2_DIAG_TRIGGER_SOURCE=root');
 
   const trialRange = 0x600000, cacheReadSize = 0x200000, fragmentCount = 16;
   const minimumCacheHeld = 0x2810, metadataAttempts = 12;
@@ -313,9 +315,9 @@ async function main() {
     let markerDirectory = scratch;
     for (const segment of segments) {
       markerDirectory += '/' + segment;
-      check(!(await normal(temporary, 2, markerDirectory)).result, 'Extent directory creation failed');
+      check(!(await normal(saved, 2, markerDirectory)).result, 'Extent directory creation failed');
     }
-    check(!(await normal(temporary, 0, markerDirectory + '/' + marker,
+    check(!(await normal(saved, 0, markerDirectory + '/' + marker,
       Buffer.concat([u64(0), u64(1)]))).result, 'Extent marker creation failed');
     async function nativeLinks(range) {
       const snapshots = [range, ...(range.fragmentation || [])];

@@ -120,9 +120,14 @@ async function startLoader(host,payload,onLine) {
   socket.end(payload); // half-close PC->console; keep console->PC logs open
   return channel;
 }
+// Only allowlisted NS2_* variables reach the child checker; any other NS2_ name is stripped.
+function childEnvironment(source,directory,root=ROOT) {
+  const env={...source,NS2_TARGET:'civ7',NS2_PORT_ROOT:path.join(root,'port'),NS2_TARGET_ROOT:directory};
+  for(const k of Object.keys(env))if(k.startsWith('NS2_')&&!['NS2_TARGET','NS2_PORT_ROOT','NS2_TARGET_ROOT','NS2_DIAG_TRIGGER_EARLY','NS2_DIAG_TRIGGER_SOURCE','NS2_DIAG_SESSION_LAYOUT'].includes(k))delete env[k];
+  return env;
+}
 async function runChild(directory,append) {
-  const env={...process.env,NS2_TARGET:'civ7',NS2_PORT_ROOT:path.join(ROOT,'port'),NS2_TARGET_ROOT:directory};
-  for(const k of Object.keys(env))if(k.startsWith('NS2_')&&!['NS2_TARGET','NS2_PORT_ROOT','NS2_TARGET_ROOT','NS2_DIAG_TRIGGER_EARLY','NS2_DIAG_TRIGGER_SOURCE'].includes(k))delete env[k];
+  const env=childEnvironment(process.env,directory);
   const child=spawn(process.execPath,[path.join(directory,'switch2/fs-check.cjs')],
     {cwd:directory,env,windowsHide:true,stdio:['ignore','pipe','pipe']});
   return new Promise((resolve,reject)=>{
@@ -209,4 +214,4 @@ async function main(args=process.argv.slice(2)) {
   return result.verified?0:2;
 }
 if(require.main===module)main().then(code=>{process.exitCode=code;}).catch(e=>{console.error(e.stack);process.exitCode=1;});
-module.exports={main,options,localIPv4,buildPayload,LoaderChannel,passed,connectSocket};
+module.exports={main,options,localIPv4,buildPayload,LoaderChannel,passed,connectSocket,childEnvironment,runChild};
