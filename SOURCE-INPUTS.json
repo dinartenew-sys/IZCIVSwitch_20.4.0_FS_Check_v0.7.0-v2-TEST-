@@ -1,0 +1,612 @@
+{
+  "upstreamCommit": "6466918d6346aa0b5965fa0d44729235c4d94b14",
+  "inputs": [
+    {
+      "path": "kit/port/civ7-app/cache-mount-sdk.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9439970972027e7abba8aba9e5d90b831439b1a0",
+      "size": 1686,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/9439970972027e7abba8aba9e5d90b831439b1a0",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/civ7-app/compat-affinity-reference.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e5eb204f9ea0a4e27eb450dc4bc27ba588fdc404",
+      "size": 2797,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/e5eb204f9ea0a4e27eb450dc4bc27ba588fdc404",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/civ7-app/event-code.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9bea9a2b82953be4ece53acadebebb0583d30ce9",
+      "size": 4161,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/9bea9a2b82953be4ece53acadebebb0583d30ce9",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/civ7-app/hash-code.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ac5b546723aaf8de1057567453263fd45cbeb5ec",
+      "size": 977,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/ac5b546723aaf8de1057567453263fd45cbeb5ec",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/civ7-app/sdk-proxy-code.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "32c252aa73e60c9a3c8d5b1af9c10a134d8a1ba4",
+      "size": 378,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/32c252aa73e60c9a3c8d5b1af9c10a134d8a1ba4",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/civ7-app/thread-code.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "94b97ba1563be3ca1e785d0e1b29fa36f453dd81",
+      "size": 24501,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/94b97ba1563be3ca1e785d0e1b29fa36f453dd81",
+      "adapted": true
+    },
+    {
+      "path": "kit/port/civ7-app/thread-scheduling-reference.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0035f1fd1fd4a8b32769f580d87e8ac7582749c1",
+      "size": 15937,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/0035f1fd1fd4a8b32769f580d87e8ac7582749c1",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/civ7-app/timing-code.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e4d174fb48cf635537b3bd350b470832f2122733",
+      "size": 1716,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/e4d174fb48cf635537b3bd350b470832f2122733",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/lib/bridge.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d61c5188bf29911279972a5b3b8fc53e70768050",
+      "size": 3922,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/d61c5188bf29911279972a5b3b8fc53e70768050",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/lib/connection.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fd61ace4885ec9fcc2e74d351ad999c50293ec98",
+      "size": 5847,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/fd61ace4885ec9fcc2e74d351ad999c50293ec98",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/lib/native.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ebe731c741517cacfc16244935491432d5be47b1",
+      "size": 7119,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/ebe731c741517cacfc16244935491432d5be47b1",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/lib/qualify.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f7a78c371ca71cf1fca5f3ea1cb752792758f9b4",
+      "size": 3593,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/f7a78c371ca71cf1fca5f3ea1cb752792758f9b4",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/shared/domain.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a938db3efbe613013b44690bdb5ef3e4b2e08104",
+      "size": 3077,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/a938db3efbe613013b44690bdb5ef3e4b2e08104",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/shared/frames.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9567d378bbadde37c1b71231fa52c6920570719b",
+      "size": 4390,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/9567d378bbadde37c1b71231fa52c6920570719b",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/shared/ipc.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f1ec77ebf7405a5e8d759ad00afb69325be5fc7",
+      "size": 2486,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/6f1ec77ebf7405a5e8d759ad00afb69325be5fc7",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/shared/rpc.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "429f77cc7acf8def28d27e2fe4ec27b000fe4d62",
+      "size": 3106,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/429f77cc7acf8def28d27e2fe4ec27b000fe4d62",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/shared/sdk-functions.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "77292ca6b0828e3896bdd6362e774551543d05b9",
+      "size": 1718,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/77292ca6b0828e3896bdd6362e774551543d05b9",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/shared/sdk-layout.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aa511b7ebbe3674eb6bcccd0f727533a260dc7ef",
+      "size": 1460,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/aa511b7ebbe3674eb6bcccd0f727533a260dc7ef",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/shared/target.civ7.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0f496587238487cd1518d4049320a75c918cfcff",
+      "size": 2640,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/0f496587238487cd1518d4049320a75c918cfcff",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/shared/target.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b566c77e9b9bc1ee222fb84aeab7b1660cce0c14",
+      "size": 11214,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/b566c77e9b9bc1ee222fb84aeab7b1660cce0c14",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/shared/target.smilebasic.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "696ab376a81bcc61973edc8fa2a50b5d49cbc6ff",
+      "size": 2194,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/696ab376a81bcc61973edc8fa2a50b5d49cbc6ff",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/app/affinity.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "29265d566259f9aeed256c69b889c51d560f8759",
+      "size": 7093,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/29265d566259f9aeed256c69b889c51d560f8759",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/app/bulk-transfer.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "41d40412be3de9cd6009925d82fd16de687d95af",
+      "size": 673,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/41d40412be3de9cd6009925d82fd16de687d95af",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/app/domain.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9ed57b12ebad982052c8465b112eff2b8d001701",
+      "size": 2634,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/9ed57b12ebad982052c8465b112eff2b8d001701",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/app/events.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3b5db09cce75352efad70841f6ae534f405daeaf",
+      "size": 1312,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/3b5db09cce75352efad70841f6ae534f405daeaf",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/app/filesystem.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5cfd442d0175d8c2c3bd0fd87129654b455b1812",
+      "size": 6868,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/5cfd442d0175d8c2c3bd0fd87129654b455b1812",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/app/inspect-mounts.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ee3a45b4139cc803886309006c521d3984221f6c",
+      "size": 2097,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/ee3a45b4139cc803886309006c521d3984221f6c",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/app/mounted-save.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2ed364d94b254e0ef4e4d77181aadf6a7dc36e76",
+      "size": 3619,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/2ed364d94b254e0ef4e4d77181aadf6a7dc36e76",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/app/native-worker.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0118e539b0ea85de4e1dc4c558707d68aff83685",
+      "size": 17445,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/0118e539b0ea85de4e1dc4c558707d68aff83685",
+      "adapted": true
+    },
+    {
+      "path": "kit/port/engine/switch2/app/rpc.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e59e957894f963f797824b3deb01c96c0f19e4f3",
+      "size": 2843,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/e59e957894f963f797824b3deb01c96c0f19e4f3",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/app/session.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "29f7f69affc4d482794edb4fa14c7abca7c13890",
+      "size": 6993,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/29f7f69affc4d482794edb4fa14c7abca7c13890",
+      "adapted": true
+    },
+    {
+      "path": "kit/port/engine/switch2/app/timing.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8d27c2a8bcb6f15d55f5569bd84af77728d9f40d",
+      "size": 4123,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/8d27c2a8bcb6f15d55f5569bd84af77728d9f40d",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/app/worker.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c0e41cc91df9505f888c413ef8672a2715a47513",
+      "size": 2037,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/c0e41cc91df9505f888c413ef8672a2715a47513",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/memory/cache-address-plan.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "540d309e17edeae024074eca760decb0745e3482",
+      "size": 618,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/540d309e17edeae024074eca760decb0745e3482",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/memory/cache-mount.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "866c6bf5dc90ae4afa6d57c4de089fa5617affc1",
+      "size": 2133,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/866c6bf5dc90ae4afa6d57c4de089fa5617affc1",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/memory/capture-workers.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "77a52cd47343770b0a68a4d7847f616bd67404f2",
+      "size": 1179,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/77a52cd47343770b0a68a4d7847f616bd67404f2",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/memory/fs-memory-control.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "80b2d3256b2b2b826eb8a378c649a941bcd076d7",
+      "size": 20458,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/80b2d3256b2b2b826eb8a378c649a941bcd076d7",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/memory/fs-root-control.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "edbf77adda0dbbfb3ebacf38c6dda06266c78e5d",
+      "size": 7908,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/edbf77adda0dbbfb3ebacf38c6dda06266c78e5d",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/memory/mounted-rom.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e27a027ad430c3158070804e3812f7a42e3889b8",
+      "size": 3053,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/e27a027ad430c3158070804e3812f7a42e3889b8",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/memory/native-links.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e891c7f3e8995e369905d1bde4bc14e0cb76dde7",
+      "size": 2353,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/e891c7f3e8995e369905d1bde4bc14e0cb76dde7",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/memory/normalized-path.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f09c2f8c4e09f19b3d4176c61c80a9d830a3c49",
+      "size": 486,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/6f09c2f8c4e09f19b3d4176c61c80a9d830a3c49",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/memory/paths.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c83ca777d5c69c73197ea149267d617722e18e6a",
+      "size": 1670,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/c83ca777d5c69c73197ea149267d617722e18e6a",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/memory/probe-reserved-gap.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5982f733f7a82dee0e66c31ab3ecb7ec475d1124",
+      "size": 82058,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/5982f733f7a82dee0e66c31ab3ecb7ec475d1124",
+      "adapted": true
+    },
+    {
+      "path": "kit/port/engine/switch2/memory/run-control.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "54776e45a06c1ced60e81ac5089cc885381c4080",
+      "size": 2728,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/54776e45a06c1ced60e81ac5089cc885381c4080",
+      "adapted": true
+    },
+    {
+      "path": "kit/port/engine/switch2/memory/session-tools.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7e48b3b8511683626571d32addfb11dbe72b163d",
+      "size": 3284,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/7e48b3b8511683626571d32addfb11dbe72b163d",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/memory/session.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "588982f98c6f8e3b0f71a9eccd2c3770f328bced",
+      "size": 869,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/588982f98c6f8e3b0f71a9eccd2c3770f328bced",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/memory/signed-cache-plan.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ad373d607000f9f5a116c60815932b1cf95ad216",
+      "size": 5203,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/ad373d607000f9f5a116c60815932b1cf95ad216",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/memory/verify-proof.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d195f5020021ba75e210a0c23ba4064d9a014275",
+      "size": 3130,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/d195f5020021ba75e210a0c23ba4064d9a014275",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/memory/wave-history.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a743e4bfe53618765fd4f05057848ec3bb6abd01",
+      "size": 5584,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/a743e4bfe53618765fd4f05057848ec3bb6abd01",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/memory/wave-overlap.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d74d9af2b4dcd491d0cecd75da7e26c2459dbe8d",
+      "size": 978,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/d74d9af2b4dcd491d0cecd75da7e26c2459dbe8d",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/memory/wave-overlap.test.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "26643747df0f14de18d51e61ada1899400f093ad",
+      "size": 1179,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/26643747df0f14de18d51e61ada1899400f093ad",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/retained/cache-shape.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f981f1ebe2f58e293d550d8d211570873a3cf386",
+      "size": 976,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/f981f1ebe2f58e293d550d8d211570873a3cf386",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/retained/cache-shape.test.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6cebfd7a46dddd1253f66acf530c4836a0095f86",
+      "size": 703,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/6cebfd7a46dddd1253f66acf530c4836a0095f86",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/retained/find-metadata.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cb7d075b40b1dbbabac47117086ccbfdd86ecc6e",
+      "size": 10677,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/cb7d075b40b1dbbabac47117086ccbfdd86ecc6e",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/retained/link-anchor.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cf3bf6ff38437fbdadbd70fefc8dd0c09c10206d",
+      "size": 812,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/cf3bf6ff38437fbdadbd70fefc8dd0c09c10206d",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/retained/links.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6754f8cf6d05e9624bf642632d9d034a5106409d",
+      "size": 630,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/6754f8cf6d05e9624bf642632d9d034a5106409d",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/retained/lower-window.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3977dc89239e6588d7efb9e8e30166bbc02659f4",
+      "size": 1631,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/3977dc89239e6588d7efb9e8e30166bbc02659f4",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/retained/metadata-window.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7ddea0ed4b758f6558a6db0efd53173cb0d299f1",
+      "size": 1040,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/7ddea0ed4b758f6558a6db0efd53173cb0d299f1",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/retained/metadata-window.test.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0cb2bcab3c30304e611a3bc19c1a7263b4afce58",
+      "size": 1046,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/0cb2bcab3c30304e611a3bc19c1a7263b4afce58",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/retained/pool-anchor.test.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6a9b04b1fda65468b38091ceb75c8c99f62ad816",
+      "size": 2530,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/6a9b04b1fda65468b38091ceb75c8c99f62ad816",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/engine/switch2/retained/retained-memory.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "776adc32cab090f23a8283f5554005015d7177b3",
+      "size": 27079,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/776adc32cab090f23a8283f5554005015d7177b3",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/sdk-functions.civ7.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "47109cd559ca65b9835fb562fb0296cf9bb2d890",
+      "size": 1527,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/47109cd559ca65b9835fb562fb0296cf9bb2d890",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/sdk-layout.civ7.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d1d255b3c07626d06b001e1eb3f61ef6e3c5334b",
+      "size": 1532,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/d1d255b3c07626d06b001e1eb3f61ef6e3c5334b",
+      "adapted": false
+    },
+    {
+      "path": "kit/port/civ_bridge.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cd33cebbe54a3e5de0b7fa7d24ae156d8c55bf25",
+      "size": 12437,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/cd33cebbe54a3e5de0b7fa7d24ae156d8c55bf25"
+    },
+    {
+      "path": "kit/port/engine/switch2/app/qualify.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5307c150432ed6d993d292caeada8af75a1dc84b",
+      "size": 5074,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/5307c150432ed6d993d292caeada8af75a1dc84b"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9efa6fbc962836e243e20f7f23db062e2c077d28",
+      "size": 17984,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/9efa6fbc962836e243e20f7f23db062e2c077d28"
+    },
+    {
+      "path": "LICENSE-MIT-Gezine.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "65a250c623f5bf2efed99cfd5cfa72060b229cd1",
+      "size": 1063,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/65a250c623f5bf2efed99cfd5cfa72060b229cd1"
+    },
+    {
+      "path": "NOTICE.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7518086b05fb2f2b065f78b62a44cc07c52892f9",
+      "size": 2526,
+      "url": "https://api.github.com/repos/byizmysh/IZCIVSwitch/git/blobs/7518086b05fb2f2b065f78b62a44cc07c52892f9"
+    }
+  ]
+}

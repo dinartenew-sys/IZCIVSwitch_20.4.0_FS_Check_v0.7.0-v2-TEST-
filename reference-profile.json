@@ -1,0 +1,329 @@
+{
+  "schemaVersion": 1,
+  "name": "IZCIVSwitch Civ7 SDK fingerprint",
+  "upstream": {
+    "repository": "https://github.com/byizmysh/IZCIVSwitch",
+    "commit": "6466918d6346aa0b5965fa0d44729235c4d94b14",
+    "documentedFirmware": "23.0.1"
+  },
+  "requestedFirmware": "20.4.0",
+  "firmwareEvidence": "user-reported; not detected by this probe",
+  "scope": "Application SDK fingerprint only; system FS, workers, race and RO/PM stages remain untested",
+  "sdk": {
+    "textBytes": 6299648,
+    "crc32": 157086863,
+    "mappingType": 3,
+    "permissions": 5,
+    "attributes": 0,
+    "queryMemoryOffset": 1477388,
+    "queryMemoryBytes": "e10f1ff8c10000d4e20340f9410000b9ff430091c0035fd6"
+  },
+  "signatures": [
+    {
+      "name": "sdk/allocate",
+      "offset": 5320512,
+      "bytes": "fd7bbca9f70b00f9f65702a9f44f03a9fd030091f30300aac00280523f2000f1a303005428fc41d3f50301aa08f10092280008cb09e5009208fd42d308e50092"
+    },
+    {
+      "name": "sdk/free",
+      "offset": 6179984,
+      "bytes": "102a00b0119244f91082249120021fd6"
+    },
+    {
+      "name": "sdk/getService",
+      "offset": 1363088,
+      "bytes": "fd7bbea9f44f01a9fd030091f30300aa020100b4280040395f0400f181050054ed031faaeb031faaea031faa05000014ed031faaeb031faaea031faae8031f2a"
+    },
+    {
+      "name": "sdk/send",
+      "offset": 1477716,
+      "bytes": "410400d4c0035fd6"
+    },
+    {
+      "name": "sdk/close",
+      "offset": 1477604,
+      "bytes": "c10200d4c0035fd6"
+    },
+    {
+      "name": "sdk/memset",
+      "offset": 5384944,
+      "bytes": "420600b44800008b5f0c00f10100003901f11f38a30500545f1c00f1010400390108003901e11f3801d11f38e30400545f2400f1010c003901c11f3863040054"
+    },
+    {
+      "name": "sdk/memcpy",
+      "offset": 5383392,
+      "bytes": "ec0301cb8a0940924b000aeb69040054e90301aae80300aa6a0100b4e80301aae90300aacc0910374c0a08376c000036080140392801003908000a8b29000a8b"
+    },
+    {
+      "name": "sdk/memmove",
+      "offset": 5384240,
+      "bytes": "1f0001ebe00a00542800028b1f0100eb090300540900028b3f0101eba90200541f0001eb820200545f8000f1c3060054290840f2c00600540a01805228f17db2"
+    },
+    {
+      "name": "sdk/svcQueryMemory",
+      "offset": 1477388,
+      "bytes": "e10f1ff8c10000d4e20340f9410000b9ff430091c0035fd6"
+    },
+    {
+      "name": "sdk/svcSendSyncRequest",
+      "offset": 1477716,
+      "bytes": "410400d4c0035fd6"
+    },
+    {
+      "name": "sdk/svcCloseHandle",
+      "offset": 1477604,
+      "bytes": "c10200d4c0035fd6"
+    },
+    {
+      "name": "sdk/crc32",
+      "offset": 470864,
+      "bytes": "e203022a5fcb1514"
+    },
+    {
+      "name": "mount/0",
+      "offset": 700176,
+      "bytes": "e20301aae10300aa405400f000c0219134f41414"
+    },
+    {
+      "name": "mount/1",
+      "offset": 672800,
+      "bytes": "fd7bbca9f85f01a9f65702a9f44f03a9fd030091c20300b414400091f70300aaf60302aae00314aaf50301aad507159453409e52b306a072f80317aa1f2003d5180740f91f0317eb2001005400430091e10316aa02028052760a159420ffff35f3031f2a082300d1a80200f9e00314aacc071594e003132af44f43a9f65742a9f85f41a9fd7bc4a8c0035fd653c08b52f305a072e003132af44f43a9f65742a9f85f41a9fd7bc4a8c0035fd600000000"
+    },
+    {
+      "name": "mount/2",
+      "offset": 672608,
+      "bytes": "ff0301d1fd7b01a9f65702a9f44f03a9fd43009113400091f60300aaf40301aae00313aa07081594f50316aa1f2003d5b50640f9bf0216ebe0020054a0420091e10314aa02028052aa0a159420ffff35a92240a90a0140f9280500f9a90240f9090100f9550500f9aa0200f9a88e5ff8e00315aa080540f900013fd6e00313aaf44f43a9f65742a9fd7b41a9ff030191f407151453409e52b306a072414100b0212c0f91e00313aae20314aa010e1594a01300d1b3c31fb86e08159400000000"
+    },
+    {
+      "name": "mount/3",
+      "offset": 865328,
+      "bytes": "fd7bbda9fc0b00f9fd030091f44f02a9ff430cd1f40300aae00302aaf30301aa68521494e9031faaea3f00911f2003d50c6869380800098b4c0100344b01098b6c0100390c0540392c010034290900916c0500393f010c71c1feff540800098bea3f00914901098b05000014ea3f0091080500914901098b290500913f010039e903202a2901080b1f2003d51f2003d50a15403829050011caffff353f010c7188010054800a40f9e23f0091e10313aa080040f9083140f900013fd6ff430c91f44f42a9fc0b40f9fd7bc3a8c0035fd640c09c52c005a072ff430c91f44f42a9fc0b40f9fd7bc3a8c0035fd6"
+    },
+    {
+      "name": "thread-code.json/create",
+      "offset": 1319296,
+      "bytes": "ff4302d1fd7b04a9f92b00f9f85f06a9f65707a9f44f08a9fd030191f50303aaf60302aaf40301aaf30300aa810000b5e0230091f4230091ee000094881e40b91f050071480d005401010054882240b91f050071c80c0054882640b9081500511f7d0071480c0054880240f9d80280521f0540f1e30b0054092d4092a90b00b5980a40f91f2f40f2210b0054971640f9d70000b48f9212941f0017ea800a0054880240f9980a40f91f0100f1090088522900a0723901889af80000b401648152000180525ba51294f70300aa000100b550000014210740910000825255a51294800900b4f70300aa18044091e0820c91e1031f2aff22067902008152ff4a0c39"
+    },
+    {
+      "name": "thread-code.json/join",
+      "offset": 1320064,
+      "bytes": "e803202a1f0940f261020054fd7bbea9f44f01a9fd030091f30301aa14f07d92d49412941f0014eba001005488420c914a008052097d5f083f050071810100540a7d0b088bffff352a0080526a01003612000014c0028052c0035fd660048052f44f41a9fd7bc2a8c0035fd6ea031f2a5f3f03d53f0100373f110071e1010054a90080520a7d5f085f11007141010054097d0a088affff35e00314aae10313aabc030094e0031f2af44f41a9fd7bc2a8c0035fd65f3f03d5c0028052f44f41a9fd7bc2a8c0035fd6"
+    },
+    {
+      "name": "thread-code.json/exit",
+      "offset": 1319952,
+      "bytes": "fd7bbea9f30b00f9fd030091f30300aaf494129468d03bd5493d00b029810f9108f140f91f0100f1041149fac000005408054039090840b2081d00121f4101712001809ae803202a1f0940f28100005408f07d9209494c394900003599851294006107912100805213e900f945891294"
+    },
+    {
+      "name": "thread-code.json/current",
+      "offset": 1273936,
+      "bytes": "68d03bd500fd40f9c0035fd6"
+    },
+    {
+      "name": "thread-code.json/longjmp",
+      "offset": 5575092,
+      "bytes": "135040a9155841a9176042a9196843a91b7044a91d7845a9023440f95f0000910824476d0a2c486d0c34496d0e3c4a6d3f00007120149f1ac0031fd6"
+    },
+    {
+      "name": "thread-code.json/loadTable",
+      "offset": 319636,
+      "bytes": "a80240f90041348bf44f42a9f50b40f9fd7bc3a8c0035fd6"
+    },
+    {
+      "name": "thread-code.json/call4",
+      "offset": 3513224,
+      "bytes": "e00319aae10315aae20314aae30313aae7031faa083940f900013fd6f44f4ea9f6574da9f85f4ca9fa674ba9fd7b4aa9ffc30391c0035fd6"
+    },
+    {
+      "name": "thread-code.json/saveResult",
+      "offset": 2673024,
+      "bytes": "600200b9f30b40f9fd7bc2a8c0035fd6"
+    },
+    {
+      "name": "thread-code.json/saveResult64",
+      "offset": 1686720,
+      "bytes": "600200f9f30b40f9fd7bc2a8c0035fd6"
+    },
+    {
+      "name": "thread-code.json/tryWait",
+      "offset": 1274128,
+      "bytes": "484f00f0e10300aa084141f900c10391accf1214"
+    },
+    {
+      "name": "thread-code.json/tryWaitImplementation",
+      "offset": 1302816,
+      "bytes": "ff0301d1fd7b01a9f51300f9f44f03a9fd43009128b041b9f30301aaa0630091a173009122008052a81f00b9e3031faa34008052a8aa0094a001003435809d52085400121f01156be101005468b241b9a0630091a173009122008052e3031faaa81f00b99caa0094c0feff35e003142af44f43a9f51340f9fd7b41a9ff030191c0035fd629409d521f0109eb01010054f4031f2ae003142af44f43a9f51340f9fd7b41a9ff030191c0035fd6a0c31fb8a01300d1ffa01294"
+    },
+    {
+      "name": "thread-code.json/sleep",
+      "offset": 1274112,
+      "bytes": "b0cf1214"
+    },
+    {
+      "name": "raw-svc/createThread",
+      "offset": 1477420,
+      "bytes": "e00f1ff8010100d4e20340f9410000b9ff430091c0035fd6"
+    },
+    {
+      "name": "raw-svc/startThread",
+      "offset": 1477444,
+      "bytes": "210100d4c0035fd6"
+    },
+    {
+      "name": "raw-svc/exitThread",
+      "offset": 1477452,
+      "bytes": "410100d4c0035fd6"
+    },
+    {
+      "name": "raw-svc/getThreadPriority",
+      "offset": 1477468,
+      "bytes": "e00f1ff8810100d4e20340f9410000b9ff430091c0035fd6"
+    },
+    {
+      "name": "raw-svc/getThreadCoreMask",
+      "offset": 1477500,
+      "bytes": "e007bfa9c10100d4e30340f9610000b9e30740f9620000f9ff430091c0035fd6"
+    },
+    {
+      "name": "raw-svc/setThreadCoreMask",
+      "offset": 1477532,
+      "bytes": "e10100d4c0035fd6"
+    },
+    {
+      "name": "raw-svc/getCurrentProcessorNumber",
+      "offset": 1477540,
+      "bytes": "010200d4c0035fd6"
+    },
+    {
+      "name": "raw-svc/closeHandle",
+      "offset": 1477604,
+      "bytes": "c10200d4c0035fd6"
+    },
+    {
+      "name": "raw-svc/waitSynchronization",
+      "offset": 1477620,
+      "bytes": "e00f1ff8010300d4e20340f9410000b9ff430091c0035fd6"
+    },
+    {
+      "name": "raw-svc/readTpidrro",
+      "offset": 1358464,
+      "bytes": "60d03bd5c0035fd6"
+    },
+    {
+      "name": "event-code.json/initialize",
+      "offset": 1254624,
+      "bytes": "280080525f04007108040039e8179f1a3f000072080000394800805208119f1a080400b9c0035fd6"
+    },
+    {
+      "name": "event-code.json/finalize",
+      "offset": 1254672,
+      "bytes": "1f040039c0035fd6"
+    },
+    {
+      "name": "event-code.json/wait",
+      "offset": 1255040,
+      "bytes": "ff0301d1fd7b01a9f65702a9f44f03a9fd430091f30300aa6846403848050034350080521400809236409f5268fedf88c80100351b0000141f2003d51f2003d5e00313aa4100805222008052e30314aa93d90094085400121f01166be106005468fedf88e80100341f050071a0feff541f090071610400541f2003d51f2003d568fe5f881f090071610100547ffe088888ffff352b0000141f2003d51f2003d568fe5f888800003575fe0888a8ffff35e4ffff175f3f03d568fedf8868fdff35f8ffff172800805269fedf882901003569fe5f888900003568fe0988a9ffff35090000145f3f03d569fedf8829ffff343f050071800000543f09007120020054"
+    },
+    {
+      "name": "event-code.json/tryWait",
+      "offset": 1255392,
+      "bytes": "08444038680100341f2003d51f2003d508fc5f881f090071610100541ffc088888ffff3520008052bf3b03d5c0035fd608fcdf88bf3b03d51f090071e0179f1ac0035fd6e0031f2a5f3f03d5bf3b03d5c0035fd6"
+    },
+    {
+      "name": "event-code.json/signal",
+      "offset": 1254688,
+      "bytes": "ff0301d1fd7b01a9f65702a9f44f03a9fd430091f30300aa68464038e80200345400805235409f52bf3b03d5680240b9c80100341f05007101050054e00313aa410080522200805223008052eed90094085400121f01156b80feff542200001474fe0888c804003468fe5f88a8ffff345f3f03d5edffff17550080521400801236409f52bf3b03d5680240b9e80100341f05007121020054e00313aa2100805222008052e303142ad7d90094085400121f01166b80feff540f0000141f2003d575fe0888c801003468fe5f88a8ffff345f3f03d5ecffff171f09007100010054f8c81294e00b00b9a0000034e0230091f0cf1294a0c31fb8c0000035f44f43a9"
+    },
+    {
+      "name": "event-code.json/clear",
+      "offset": 1254976,
+      "bytes": "08100091bf3b03d51f2003d51f2003d509fd5f883f090071a10000541ffd098889ffff35bf3b03d5c0035fd65f3f03d5bf3b03d5c0035fd6"
+    },
+    {
+      "name": "event-code.json/waitAddress",
+      "offset": 1477916,
+      "bytes": "810600d4c0035fd6"
+    },
+    {
+      "name": "event-code.json/signalAddress",
+      "offset": 1477924,
+      "bytes": "a10600d4c0035fd6"
+    },
+    {
+      "name": "timing-code.json/tick",
+      "offset": 1274432,
+      "bytes": "20e03bd5c0035fd6"
+    },
+    {
+      "name": "timing-code.json/frequency",
+      "offset": 1274480,
+      "bytes": "00009f528024a072c0035fd6"
+    },
+    {
+      "name": "timing-code.json/priority",
+      "offset": 1274048,
+      "bytes": "0088c079c0035fd6"
+    },
+    {
+      "name": "hash",
+      "offset": 19776,
+      "bytes": "ffc302d1fd7b08a9f65709a9f44f0aa9fd030291f60300aae0230091ff7b00b9f30303aaf40302aaf50301aa317c1794e0230091e10314aae20313aa257c1794e0230091e10316aae20315aa2d7c1794e0230091237c1794f44f4aa9f65749a9fd7b48a9ffc30291c0035fd6"
+    },
+    {
+      "name": "sdk-proxy",
+      "offset": 776496,
+      "bytes": "fd7bbea9f44f01a9fd030091695400d02961119129fddf08a9010036695400d0202942f9000100f9c00000b4080040f9f44f41a9010140f9fd7bc2a820001fd6f44f41a9fd7bc2a8c0035fd6605400d000601191f30308aafea01494e80313aae0fdff340f000094745400d0944211911f2003d540f8ff10a25300f042000091e10314aa070afd9780220091f5a01494e80313aae2ffff17"
+    },
+    {
+      "name": "thread-scheduling-reference.json/pthread_getaffinity_np",
+      "offset": 1317344,
+      "bytes": "3f2000f162000054c0028052c0035fd6a00100b4fd7bbda9f50b00f9f44f02a9fd030091e803202af30302aaf40301aa1f0940f215f07d92a1000054a8420c910700001460008052c0035fd6b9050094a84e208b084140f9680300b4493d00d029810f911f0109ebe002005408014039080500511f090071c2020054a1630091e0031faae20315aa6ea51294a80f40f99f4200f1680200f9c300005488f27d9260220091e1031f2a022100d125881294e0031f2af44f42a9f50b40f9fd7bc3a8c0035fd6a80241391f0d007180fdff5460008052f44f42a9f50b40f9fd7bc3a8c0035fd6"
+    },
+    {
+      "name": "thread-scheduling-reference.json/pthread_setaffinity_np",
+      "offset": 1317584,
+      "bytes": "fd7bbea9f44f01a9fd030091f30300aa3f2000f162000054f4031faa04000014540040f93f4000f16201005455941294140014ea00030054530600b4e803332a73f27d921f0940f2e102005468420c911900001428fc43d3490080521f0900f10a81899a490440f9690100b54b008052e9030baa5f010beba00000544c7869f82b0500916cffffb4f4031faa3f0108ebe2fcff54c0028052f44f41a9fd7bc2a8c0035fd667050094684e208b084140f9280200b4493d00d029810f911f0109eba001005408014039080500511f0900718201005401008012e00313aae20314aa14a51294e0031f2af44f41a9fd7bc2a8c0035fd6680241391f0d0071c0feff54"
+    },
+    {
+      "name": "thread-scheduling-reference.json/pthread_getschedparam",
+      "offset": 1317856,
+      "bytes": "e80300aac0028052e10500b4fd7bbda9f50b00f9f44f02a9fd030091f40302aac20400b4880400b4e903282af30301aa15f17d923f0940f261000054a8420c91050000143b050094a84e208b084140f9c80200b4493d00d029810f911f0109eb4002005408014039080500511f09007122020054e00315aacaa41294e803002ae90380527f0200b91f7c0071e0031f2a08b1891a89048052087da80a2801084b880200b905000014a80241391f0d007120feff5460008052f44f42a9f50b40f9fd7bc3a8c0035fd6"
+    },
+    {
+      "name": "thread-scheduling-reference.json/pthread_setschedprio",
+      "offset": 1318272,
+      "bytes": "281400511f7d007188010054a00100b4fd7bbea9f44f01a9fd030091e803202af303012a14f07d921f0940f2e100005488420c910900001440048052c0035fd660008052c0035fd6d2040094884e208b084140f9280200b4493d00d029810f911f0109eba001005408014039080500511f0900718201005488048052e00314aa0101134b57a41294e0031f2af44f41a9fd7bc2a8c0035fd6880241391f0d0071c0feff5460008052f44f41a9fd7bc2a8c0035fd6"
+    },
+    {
+      "name": "thread-scheduling-reference.json/nn::os::GetThreadCoreMask(int*, unsigned long*, nn::os::ThreadType const*)",
+      "offset": 1274304,
+      "bytes": "484f00f0e30302aa084141f9e20301aae10300aa00c1039196cf1214"
+    },
+    {
+      "name": "thread-scheduling-reference.json/nn::os::SetThreadCoreMask(nn::os::ThreadType*, int, unsigned long)",
+      "offset": 1274272,
+      "bytes": "484f00f0e30302aa084141f9e203012ae10300aa00c1039196cf1214"
+    },
+    {
+      "name": "thread-scheduling-reference.json/nn::os::GetCurrentCoreNumber()",
+      "offset": 1274192,
+      "bytes": "484f00f0084141f900c10391a5cf1214"
+    },
+    {
+      "name": "thread-scheduling-reference.json/nn::os::GetThreadAvailableCoreMask()",
+      "offset": 1274336,
+      "bytes": "484f00f0084141f900c1039195cf1214"
+    },
+    {
+      "name": "thread-scheduling-reference.json/nn::os::detail::ThreadManagerImplByHorizon::GetThreadAvailableCoreMask() const",
+      "offset": 1303684,
+      "bytes": "ff8300d1fd7b01a9fd430091e0230091e1031f2ac2ff8f12e3031faa01aa0094e00700b9a0000035e00740f9fd7b41a9ff830091c0035fd6e013009144a01294"
+    },
+    {
+      "name": "thread-scheduling-reference.json/nn::os::detail::ThreadManagerImplByHorizon::GetCurrentCoreNumber() const",
+      "offset": 1303528,
+      "bytes": "efa90014"
+    }
+  ]
+}
+
