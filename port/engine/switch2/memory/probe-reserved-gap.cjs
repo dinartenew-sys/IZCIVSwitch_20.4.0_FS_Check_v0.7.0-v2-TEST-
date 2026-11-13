@@ -28,7 +28,11 @@ async function main() {
   // DIAGNOSTIC ONLY (off by default): send the trigger without waiting for the
   // hole to finish. Tests whether the trigger is serialized behind the commit.
   const diagTriggerEarly = process.env.NS2_DIAG_TRIGGER_EARLY === '1';
-  
+  // DIAGNOSTIC ONLY (default 'A' = current layout): 'C' makes a separate filesystem
+  // copy the trigger source instead of a clone of saved. See docs/SESSION-LAYOUT-PROPOSAL.md.
+  const diagSessionLayout = process.env.NS2_DIAG_SESSION_LAYOUT || 'A';
+  if (!['A', 'C'].includes(diagSessionLayout)) throw Error('Unsupported session layout ' + diagSessionLayout);
+
   const trialRange = 0x600000, cacheReadSize = 0x200000, fragmentCount = 16;
   const minimumCacheHeld = 0x2810, metadataAttempts = 12;
   const fieldCopies = target.fieldCopies ?? 2;
@@ -112,7 +116,7 @@ async function main() {
   const preReleaseBuffer = b + 0x1d000, clearReportBuffer = b + 0x1e000, pinBuffer = b + 0x1f000;
   const triggerInput = b + 0x30000;
   const tailInputs = Array.from({length: 4}, (_, i) => b + 0x32000 + i * 0x2000);
-  const report = {session: live.session, scratch, canary, extent, markerOffset, diagTriggerEarly,
+  const report = {session: live.session, scratch, canary, extent, markerOffset, diagTriggerEarly, diagSessionLayout,
     probeReadSize, trialRange, cacheReadSize, fragmentCount, minimumCacheHeld,
     metadataAttempts, fieldCopies, waveAttempts, plannerCycle,
     started: new Date().toISOString(), cases: []};
@@ -249,9 +253,10 @@ async function main() {
     await events.verify(s);
     const frequency = await timing.verify(s), mask = await affinity.available(s);
     const cores = Array.from({length: 32}, (_, i) => 1n << BigInt(i)).filter(bit => bit & mask);
-    report.mountPlan = {save: 'save', temporary: 'save'};
+    report.mountPlan = {save: 'save', temporary: diagSessionLayout === 'C' ? 'separate-copy' : 'save'};
     saved = await mounted.cloneMountedFilesystem(s, 'save');
-    temporary = saved;
+    // Layout C: a separate copy of the same save (own session, no clone request).
+    temporary = diagSessionLayout === 'C' ? await mounted.cloneMountedFilesystem(s, 'save') : saved;
     root = await s.openService('fsp-srv');
     check(!(await s.ipc('Initialize gap root', root, 1, u64(0), {pid: true})).result, 'Root initialization failed');
     {
@@ -273,7 +278,8 @@ async function main() {
     const savedPointer = await cloneMonitor.request(saved, 3, 'Query base save pointer-buffer size');
     check(savedPointer.data.readUInt16LE() === 2048, 'Save pointer-buffer profile differs');
     const topology = await require('./compact-clients.cjs').createClients({saved, root, storage, base: b, clone,
-      triggerFrom: process.env.NS2_DIAG_TRIGGER_SOURCE === 'root' ? 'root' : 'saved'});
+      triggerFrom: process.env.NS2_DIAG_TRIGGER_SOURCE === 'root' ? 'root' : 'saved',
+      temporary: diagSessionLayout === 'C' ? temporary : null});
     const {clients, savedTrigger, tmpTrigger} = topology;
     report.cloneTopology = topology.report;
     const finalPointer = await cloneMonitor.request(savedTrigger, 3, 'Query final trigger pointer-buffer size');
