@@ -20,11 +20,19 @@ class StopRequested extends Error {
   constructor() {super('Run stopped at a checkpoint'); this.name = 'StopRequested';}
 }
 
+// DIAGNOSTIC: NS2_DIAG_STOP_AT_SCRATCH=1 requests a stop at the 'before scratch writes'
+// checkpoint, so a run can end after setup and before any scratch write.
+function diagnosticStopPoint(value) {
+  if (value === undefined || value === '' || value === '0') return null;
+  if (value === '1') return 'before scratch writes';
+  throw Error('Unsupported stop-at-scratch value ' + value);
+}
+
 class RunControl {
-  constructor({id, save}) {
+  constructor({id, save, stopAt = null}) {
     this.save = save;
     this.events = new EventEmitter();
-    this.state = {id, pid: process.pid, mode: 'running', active: false, checkpoint: 'starting'};
+    this.state = {id, pid: process.pid, mode: 'running', active: false, checkpoint: 'starting', stopAt};
     this.stopSignal = () => {
       if (this.state.mode !== 'running') return;
       this.state.mode = 'stopping';
@@ -45,6 +53,7 @@ class RunControl {
       try {await fs.access(process.env.NS2_STOP_FILE);this.stopSignal();}
       catch(e) {if(e.code!=='ENOENT')throw e;}
     }
+    if (name === this.state.stopAt) this.stopSignal();
     this.state.checkpoint = name;
     await this.save();
     if (['stopping', 'closed'].includes(this.state.mode)) throw new StopRequested();
@@ -80,4 +89,4 @@ function reportWriter(file, snapshot) {
   };
 }
 
-module.exports = {RunControl, StopRequested, reportWriter};
+module.exports = {RunControl, StopRequested, reportWriter, diagnosticStopPoint};

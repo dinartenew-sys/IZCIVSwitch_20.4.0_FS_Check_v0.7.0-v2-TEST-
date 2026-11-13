@@ -5,7 +5,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const {performance} = require('node:perf_hooks');
 const {connect, check, u64} = require("./session.cjs");
-const {RunControl, StopRequested, reportWriter} = require("./run-control.cjs");
+const {RunControl, StopRequested, reportWriter, diagnosticStopPoint} = require("./run-control.cjs");
 const {packPages} = require("./session-tools.cjs");
 const {paths, pathPacket, pathPackets} = require("./paths.cjs");
 const normalizedPath = require("./normalized-path.cjs");
@@ -34,6 +34,8 @@ async function main() {
   if (!['A', 'C'].includes(diagSessionLayout)) throw Error('Unsupported session layout ' + diagSessionLayout);
   if (diagSessionLayout === 'C' && process.env.NS2_DIAG_TRIGGER_SOURCE === 'root')
     throw Error('Layout C does not support NS2_DIAG_TRIGGER_SOURCE=root');
+  // DIAGNOSTIC ONLY (off by default): stop at the 'before scratch writes' checkpoint.
+  const diagStopPoint = diagnosticStopPoint(process.env.NS2_DIAG_STOP_AT_SCRATCH);
 
   const trialRange = 0x600000, cacheReadSize = 0x200000, fragmentCount = 16;
   const minimumCacheHeld = 0x2810, metadataAttempts = 12;
@@ -118,7 +120,7 @@ async function main() {
   const preReleaseBuffer = b + 0x1d000, clearReportBuffer = b + 0x1e000, pinBuffer = b + 0x1f000;
   const triggerInput = b + 0x30000;
   const tailInputs = Array.from({length: 4}, (_, i) => b + 0x32000 + i * 0x2000);
-  const report = {session: live.session, scratch, canary, extent, markerOffset, diagTriggerEarly, diagSessionLayout,
+  const report = {session: live.session, scratch, canary, extent, markerOffset, diagTriggerEarly, diagSessionLayout, diagStopPoint,
     probeReadSize, trialRange, cacheReadSize, fragmentCount, minimumCacheHeld,
     metadataAttempts, fieldCopies, waveAttempts, plannerCycle,
     started: new Date().toISOString(), cases: []};
@@ -133,7 +135,7 @@ async function main() {
     created, storages, gates, workers, released,
   }});
   const save = reportWriter(file, snapshot);
-  const runControl = new RunControl({id: label, save});
+  const runControl = new RunControl({id: label, save, stopAt: diagStopPoint});
   report.control = runControl.state;
   const call = (offset, args = [0, 0, 0, 0], name) => ({function: live.sdk + offset, args, name});
   const wait = address => call(events.code.wait.offset, [address, 0, 0, 0]);
@@ -1180,7 +1182,7 @@ async function main() {
     }
     report.completed = true;
   } catch (error) {
-    if (error instanceof StopRequested) report.stopped = true;
+    if (error instanceof StopRequested) {report.stopped = true; report.stoppedAt = runControl.state.checkpoint;}
     else {
       report.error = error.stack;
       if (cloneMonitor?.state.pending || error.workerFailure?.observed === 'not-terminated' ||

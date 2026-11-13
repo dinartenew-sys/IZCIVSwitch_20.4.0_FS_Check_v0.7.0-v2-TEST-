@@ -21,8 +21,8 @@ test('staged validation rejects a missing mount-session helper before console ac
   await assert.rejects(validatePackage(temp),/Runtime package dependency check failed/);
 });
 
-async function runProbeSetup(mode){
-  let snapshot,normalCalls=0,cleanups=0,monitorCloses=0;
+async function runProbeSetup(mode,env={}){
+  let snapshot,normalCalls=0,cleanups=0,monitorCloses=0,runControlOptions;
   let nextHandle=10,handlesAtScratch;
   const s={base:0x30000000,bytes:0x2400000,label:'integration',handles:new Set(),threads:new Set(),metrics:{},
     openService:async()=>{s.handles.add(2);return 2;},
@@ -30,7 +30,7 @@ async function runProbeSetup(mode){
     close:async h=>s.handles.delete(h),closeUpload:async()=>{},ready:async()=>true,
     cleanup:async()=>{cleanups++;if(!s.threads.size){s.handles.clear();s.base=0;}},
     verifyCode:async()=>{},record:async()=>{}};
-  class RunControl{constructor(){this.state={};}async start(){this.started=true;}
+  class RunControl{constructor(options){runControlOptions=options;this.state={};}async start(){this.started=true;}
     async checkpoint(){}retire(){}async close(){}}
   class StopRequested extends Error{}
   const monitor={state:{pending:null,cleanedUp:false},initialize:async()=>{},
@@ -49,7 +49,7 @@ async function runProbeSetup(mode){
     'node:perf_hooks':require('node:perf_hooks'),
     './session.cjs':{connect:async()=>({s,live:{sdk:0x10000000,session:'boot'},directory:'/app'}),
       check:(ok,msg)=>{if(!ok)throw Error(msg);},u64:()=>Buffer.alloc(8)},
-    './run-control.cjs':{RunControl,StopRequested,reportWriter:(file,get)=>async()=>{snapshot=structuredClone(get());}},
+    './run-control.cjs':{RunControl,StopRequested,diagnosticStopPoint:require('../port/engine/switch2/memory/run-control.cjs').diagnosticStopPoint,reportWriter:(file,get)=>async()=>{snapshot=structuredClone(get());}},
     './session-tools.cjs':{packPages:()=>{}},'./paths.cjs':{paths:()=>({normal:async(handle,command)=>{
       normalCalls++;
       if(command===11){const data=Buffer.alloc(8);data.writeBigUInt64LE(0x4000000n);return {result:0,data};}
@@ -72,10 +72,10 @@ async function runProbeSetup(mode){
   const context={module:{exports:{}},require:name=>{
     const key=name.replaceAll('\\','/');if(!(key in modules))throw Error('Unexpected module '+name);return modules[key];
   },__dirname:'/memory',__filename:'/memory/probe.cjs',Buffer,console:{log:()=>{},error:()=>{}},
-    process:{env:{},exitCode:0},setTimeout,clearTimeout};
+    process:{env:{...env},exitCode:0},setTimeout,clearTimeout};
   vm.runInNewContext(syncFs.readFileSync(path.join(__dirname,'../port/engine/switch2/memory/probe-reserved-gap.cjs'),'utf8'),context);
   await context.module.exports.main();
-  return {snapshot,normalCalls,cleanups,monitorCloses,handlesAtScratch};
+  return {snapshot,normalCalls,cleanups,monitorCloses,handlesAtScratch,runControlOptions};
 }
 test('the actual acquisition stops a blocked clone before any scratch path operation',async()=>{
   const {snapshot,normalCalls,cleanups,monitorCloses}=await runProbeSetup('pending');
@@ -91,4 +91,10 @@ test('the actual acquisition reaches its first scratch write only after all ten 
   assert.equal(snapshot.cloneTopology.clones.length,7);assert.equal(snapshot.cloneMonitor.cleanedUp,true);
   assert.ok(snapshot.error.includes('SCRATCH_TEST_BOUNDARY'));assert.equal(snapshot.cleanedUp,true);
   assert.equal(cleanups,1);
+});
+test('the probe passes the stop switch to its run control, and only when it is set',async()=>{
+  const off=await runProbeSetup('success');
+  assert.equal(off.runControlOptions.stopAt,null);
+  const on=await runProbeSetup('success',{NS2_DIAG_STOP_AT_SCRATCH:'1'});
+  assert.equal(on.runControlOptions.stopAt,'before scratch writes');
 });
