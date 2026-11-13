@@ -38,7 +38,7 @@ async function main() {
   // DIAGNOSTIC ONLY (off by default): stop at the 'before scratch writes' checkpoint.
   const diagStopPoint = diagnosticStopPoint(process.env.NS2_DIAG_STOP_AT_SCRATCH);
   // DIAGNOSTIC ONLY (off by default): restore upstream's filler0, filler1 and guard0 roles.
-  const fillerRoles = diagnosticFillerRoles(process.env.NS2_DIAG_FILLER_ROLES, diagSessionLayout === 'C');
+  const fillerRoles = false;
   const roles = waveRoles(fillerRoles), releaseIndex = roles.indexOf('release');
 
   const trialRange = 0x600000, cacheReadSize = 0x200000, fragmentCount = 16;

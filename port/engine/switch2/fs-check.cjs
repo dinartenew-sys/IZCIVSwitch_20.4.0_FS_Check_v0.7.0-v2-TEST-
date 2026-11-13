@@ -82,8 +82,11 @@ async function main(){
     console.log('Backup verified. Starting ONE filesystem memory acquisition attempt.');
     result.attempted=true;
     await fs.writeFile(path.join(__dirname,'fs-check.json'),JSON.stringify(result,null,2)+'\n');
+    
+    // FIX: Removed NS2_SKIP_SERVE so the memory bridge actually opens!
     const outcome=await runScript(path.join(__dirname,'memory/probe-reserved-gap.cjs'),{
-      timeoutMs:600000,stopFile,env:{NS2_SKIP_SERVE:'1',NS2_SERVE_DELAY_MS:'0',NS2_STOP_FILE:stopFile}});
+      timeoutMs:600000,stopFile,env:{NS2_SERVE_DELAY_MS:'0',NS2_STOP_FILE:stopFile}});
+      
     result.outcome=outcome;
     const names=(await fs.readdir(path.join(__dirname,'memory'))).filter(n=>/^reserved-gap-\d+\.json$/.test(n));
     check(names.length===1,'Expected exactly one acquisition report from this fresh run');
