@@ -62,7 +62,7 @@ async function runProbeSetup(mode,env={}){
     '../../shared/sdk-functions.json':{},'../../shared/target.cjs':{
       loadTarget:()=>({thread:{mode:'raw-svc'}}),nativeEntry:()=>({offset:0,bytes:'00'})},
     './cache-address-plan.cjs':{},'./mounted-rom.cjs':{cloneMountedRom:async()=>{s.handles.add(4);return {handle:4};}},
-    './monitored-clones.cjs':{createMonitor:()=>monitor},'./compact-clients.cjs':{createClients},
+    './monitored-clones.cjs':{createMonitor:()=>monitor},'./compact-clients.cjs':{createClients},'./wave-roles.cjs':require('../port/engine/switch2/memory/wave-roles.cjs'),
     '/app/domain.cjs':domain,'/app/mounted-save.cjs':{cloneMountedFilesystem:async()=>{s.handles.add(1);return 1;}},
     '/app/events.cjs':{verify:async()=>{}},'/app/timing.cjs':{verify:async()=>31250000},
     '/app/affinity.cjs':{available:async()=>4n,pinAll:async()=>{}},

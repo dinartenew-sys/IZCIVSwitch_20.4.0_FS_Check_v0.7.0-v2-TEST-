@@ -8,17 +8,18 @@ const source=fs.readFileSync(path.join(__dirname,'../port/engine/switch2/memory/
 // the pin and to stay pending past it. A 2.2 ms canary against a 2.0 ms pin
 // failed on all 30 retries of the 2026-11-13 hardware run.
 test('canary worker starts before the pin release in the wave schedule',()=>{
-  const roles=source.match(/const roles = \[([^\]]+)\]/);
+  const {BASE_ROLES,FILLER_ROLES}=require('../port/engine/switch2/memory/wave-roles.cjs');
   const delays=source.match(/const delays = \(\[([^\]]+)\]\)/);
   const pin=source.match(/role === 'release'\) steps\.push\(sleep\((\d+)\)\)/);
-  assert.ok(roles&&delays&&pin,'wave schedule not found');
-  const roleList=roles[1].split(',').map(v=>v.trim().replace(/'/g,''));
+  assert.ok(delays&&pin,'wave schedule not found');
   const delayList=delays[1].split(',').map(v=>Number(v.trim()));
-  const canary=delayList[roleList.indexOf('canary')];
   const pinAt=Number(pin[1]);
   assert.equal(pinAt,2000000);
-  assert.ok(Number.isFinite(canary),'canary delay missing');
-  assert.ok(canary<pinAt,`canary ${canary} ns must start before pin ${pinAt} ns`);
+  for(const roleList of [BASE_ROLES,FILLER_ROLES]){
+    const canary=delayList[roleList.indexOf('canary')];
+    assert.ok(Number.isFinite(canary),'canary delay missing');
+    assert.ok(canary<pinAt,`canary ${canary} ns must start before pin ${pinAt} ns`);
+  }
 });
 
 // The wave reads beforeRelease.memory from the preRelease row. Without the

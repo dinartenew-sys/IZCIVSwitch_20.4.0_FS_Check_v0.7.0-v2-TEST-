@@ -266,6 +266,29 @@ async function restart(s, worker) {
   return launch(s, worker);
 }
 
+// Best-effort snapshot of a worker that did not terminate. Each call stores its result in
+// order, so the first logical call whose slot still holds SENTINEL is the step that was
+// executing (or about to run) when the join gave up. Reading owned result slots is read-only.
+function stepName(call) {
+  return call.name || call.kind || 'unnamed call';
+}
+
+async function stallReport(s, worker, timeoutMs) {
+  const calls = worker.calls || [];
+  const report = {observed: 'not-terminated', label: worker.label, timeoutMs, steps: calls.length,
+    completedSteps: null, stuckStep: null};
+  try {
+    const raw = await s.readOwned(worker.base + worker.resultOffsets[0], worker.resultOffsets.length * 8);
+    const values = worker.resultOffsets.map((_, i) => raw.readBigUInt64LE(i * 8));
+    const stuck = calls.findIndex((_, k) => values[worker.logicalResultIndices[k]] === SENTINEL);
+    report.completedSteps = stuck < 0 ? calls.length : stuck;
+    if (stuck >= 0) report.stuckStep = {index: stuck, name: stepName(calls[stuck])};
+  } catch (error) {
+    report.readError = error.message;
+  }
+  return report;
+}
+
 async function join(s, worker, timeoutMs = target.worker.joinTimeoutMs) {
   check(!worker.joined && s.threads.has(worker.thread), 'Worker is not owned');
   const until = Date.now() + timeoutMs;
@@ -295,7 +318,10 @@ async function join(s, worker, timeoutMs = target.worker.joinTimeoutMs) {
     if (finished) break;
     await new Promise(resolve => setTimeout(resolve, target.worker.joinPollMs));
   } while (Date.now() < until);
-  check(finished, 'Native batch did not terminate; resources retained');
+  if (!finished) {
+    throw Object.assign(Error('Native batch did not terminate; resources retained'),
+      {workerFailure: await stallReport(s, worker, timeoutMs)});
+  }
   const raw = await s.readOwned(worker.base + worker.resultOffsets[0], worker.resultOffsets.length * 8);
   const values = worker.resultOffsets.map((_, i) => raw.readBigUInt64LE(i * 8));
   check(values.every(value => value !== SENTINEL), 'Native batch did not store every result');
@@ -324,7 +350,14 @@ async function restartAll(s, workers) {
 }
 
 async function joinAll(s, workers, timeoutMs = target.worker.joinTimeoutMs) {
-  for (const worker of workers) await join(s, worker, timeoutMs);
+  for (const worker of workers) {
+    try {
+      await join(s, worker, timeoutMs);
+    } catch (error) {
+      if (error.workerFailure) error.workerFailure.unjoined = workers.filter(w => !w.joined).map(w => w.label);
+      throw error;
+    }
+  }
 }
 
-module.exports = {capacity, writeSparse, start, restart, join, restartAll, joinAll, borrowScheduling};
+module.exports = {capacity, writeSparse, start, restart, join, restartAll, joinAll, borrowScheduling, stallReport};

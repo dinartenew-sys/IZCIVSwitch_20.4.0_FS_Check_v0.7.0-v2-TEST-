@@ -42,3 +42,36 @@ manifest and archive integrity check.
 Offline tests use mocks and fixtures. v0.7.0 has not run on the console. The
 larger connection setup, FS read/write/restoration proof, later native stages,
 complete port and sustained reliability remain unverified.
+
+## Layout and filler-topology diagnostics (2026-11-13, not in the release)
+
+Hardware runs (Layout A unless noted):
+
+- Layout C, setup only (`NS2_DIAG_STOP_AT_SCRATCH=1`): stopped at `before scratch
+  writes` with ten sessions and the trigger from the separate copy. No scratch
+  write was made.
+- Layout C, full (`run-20261113T145641628Z`): scratch writes made and cleaned up,
+  restoration checks passed, no marker hit in 14 executed waves, no address proof.
+  Successful triggers completed 42 µs after the canary ended.
+- Layout A, full (`run-20261113T150036689Z`): scratch writes made and cleaned up,
+  restoration checks passed, no marker hit in 21 executed waves. Successful
+  triggers completed 32 to 505 µs after the canary ended. Under the proposal's
+  stop rule, Layout C matches Layout A on timing; Layout C has one successful
+  trigger, so the match is thin.
+- Filler topology (`NS2_DIAG_FILLER_ROLES=1`: filler0, filler1 and guard0
+  restored in upstream's positions), two attempts (`run-20261113T151519795Z`,
+  `run-20261113T152828967Z`): the monitored clone requests completed in order up
+  to `Clone guard1`, which brought owned FS handles to 12. The next request,
+  `Clone trigger`, was issued at 12 owned handles and never returned. The clone
+  monitor reported it as not terminated within 2500 ms, with cleanup not reported.
+  No wave started and no scratch file was written.
+
+The filler topology needs thirteen owned sessions at setup, and its last clone
+request always runs at twelve owned handles. That is the condition under which
+v0.6.3 stalled, so the filler topology cannot be tested within the twelve-handle
+limit. The compact ten-session setup remains the supported layout. The
+`NS2_DIAG_FILLER_ROLES` switch stays available as an opt-in diagnostic only.
+
+Whether the trigger's extent-present result depends on the filler roles remains
+untested. Upstream's reference result for `extent-present` (returns 0 on its save)
+has not been reproduced on this console with either layout.

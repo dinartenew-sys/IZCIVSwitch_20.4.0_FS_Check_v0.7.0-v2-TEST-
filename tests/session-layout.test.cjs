@@ -67,7 +67,7 @@ test('session layout switch defaults to A and only accepts A or C',()=>{
 
 // runChild strips NS2_* variables outside an allowlist before spawning fs-check.cjs,
 // which spawns the probe. Without the allowlist entry the switch never reaches the probe.
-const DIAG_ALLOWLIST=['NS2_DIAG_TRIGGER_EARLY','NS2_DIAG_TRIGGER_SOURCE','NS2_DIAG_SESSION_LAYOUT','NS2_DIAG_STOP_AT_SCRATCH'];
+const DIAG_ALLOWLIST=['NS2_DIAG_TRIGGER_EARLY','NS2_DIAG_TRIGGER_SOURCE','NS2_DIAG_SESSION_LAYOUT','NS2_DIAG_STOP_AT_SCRATCH','NS2_DIAG_FILLER_ROLES'];
 const LAUNCHER_SET=['NS2_TARGET','NS2_PORT_ROOT','NS2_TARGET_ROOT'];
 
 function sourceFiles(dir){

@@ -123,7 +123,7 @@ async function startLoader(host,payload,onLine) {
 // Only allowlisted NS2_* variables reach the child checker; any other NS2_ name is stripped.
 function childEnvironment(source,directory,root=ROOT) {
   const env={...source,NS2_TARGET:'civ7',NS2_PORT_ROOT:path.join(root,'port'),NS2_TARGET_ROOT:directory};
-  for(const k of Object.keys(env))if(k.startsWith('NS2_')&&!['NS2_TARGET','NS2_PORT_ROOT','NS2_TARGET_ROOT','NS2_DIAG_TRIGGER_EARLY','NS2_DIAG_TRIGGER_SOURCE','NS2_DIAG_SESSION_LAYOUT','NS2_DIAG_STOP_AT_SCRATCH'].includes(k))delete env[k];
+  for(const k of Object.keys(env))if(k.startsWith('NS2_')&&!['NS2_TARGET','NS2_PORT_ROOT','NS2_TARGET_ROOT','NS2_DIAG_TRIGGER_EARLY','NS2_DIAG_TRIGGER_SOURCE','NS2_DIAG_SESSION_LAYOUT','NS2_DIAG_STOP_AT_SCRATCH','NS2_DIAG_FILLER_ROLES'].includes(k))delete env[k];
   return env;
 }
 async function runChild(directory,append) {

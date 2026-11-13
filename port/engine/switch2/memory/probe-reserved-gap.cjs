@@ -6,6 +6,7 @@ const crypto = require('node:crypto');
 const {performance} = require('node:perf_hooks');
 const {connect, check, u64} = require("./session.cjs");
 const {RunControl, StopRequested, reportWriter, diagnosticStopPoint} = require("./run-control.cjs");
+const {waveRoles, diagnosticFillerRoles} = require("./wave-roles.cjs");
 const {packPages} = require("./session-tools.cjs");
 const {paths, pathPacket, pathPackets} = require("./paths.cjs");
 const normalizedPath = require("./normalized-path.cjs");
@@ -36,6 +37,9 @@ async function main() {
     throw Error('Layout C does not support NS2_DIAG_TRIGGER_SOURCE=root');
   // DIAGNOSTIC ONLY (off by default): stop at the 'before scratch writes' checkpoint.
   const diagStopPoint = diagnosticStopPoint(process.env.NS2_DIAG_STOP_AT_SCRATCH);
+  // DIAGNOSTIC ONLY (off by default): restore upstream's filler0, filler1 and guard0 roles.
+  const fillerRoles = diagnosticFillerRoles(process.env.NS2_DIAG_FILLER_ROLES, diagSessionLayout === 'C');
+  const roles = waveRoles(fillerRoles), releaseIndex = roles.indexOf('release');
 
   const trialRange = 0x600000, cacheReadSize = 0x200000, fragmentCount = 16;
   const minimumCacheHeld = 0x2810, metadataAttempts = 12;
@@ -120,7 +124,7 @@ async function main() {
   const preReleaseBuffer = b + 0x1d000, clearReportBuffer = b + 0x1e000, pinBuffer = b + 0x1f000;
   const triggerInput = b + 0x30000;
   const tailInputs = Array.from({length: 4}, (_, i) => b + 0x32000 + i * 0x2000);
-  const report = {session: live.session, scratch, canary, extent, markerOffset, diagTriggerEarly, diagSessionLayout, diagStopPoint,
+  const report = {session: live.session, scratch, canary, extent, markerOffset, diagTriggerEarly, diagSessionLayout, diagStopPoint, fillerRoles,
     probeReadSize, trialRange, cacheReadSize, fragmentCount, minimumCacheHeld,
     metadataAttempts, fieldCopies, waveAttempts, plannerCycle,
     started: new Date().toISOString(), cases: []};
@@ -201,7 +205,7 @@ async function main() {
     check(!converted.result, 'Group wrapping failed');
     group.outer = converted.data.readUInt32LE();
     
-    await s.write(requests[7], domain.wire.closeObject(group.outer));
+    await s.write(requests[releaseIndex], domain.wire.closeObject(group.outer));
 
     const handle = Buffer.alloc(4);
     handle.writeUInt32LE(owner.handle);
@@ -283,7 +287,7 @@ async function main() {
     check(savedPointer.data.readUInt16LE() === 2048, 'Save pointer-buffer profile differs');
     const topology = await require('./compact-clients.cjs').createClients({saved, root, storage, base: b, clone,
       triggerFrom: process.env.NS2_DIAG_TRIGGER_SOURCE === 'root' ? 'root' : 'saved',
-      temporary: diagSessionLayout === 'C' ? temporary : null});
+      temporary: diagSessionLayout === 'C' ? temporary : null, fillerRoles});
     const {clients, savedTrigger, tmpTrigger} = topology;
     report.cloneTopology = topology.report;
     const finalPointer = await cloneMonitor.request(savedTrigger, 3, 'Query final trigger pointer-buffer size');
@@ -379,7 +383,7 @@ async function main() {
     
     storages.push(storage);
     
-    const roles = ['commit', 'hole', 'tail0', 'tail1', 'tail2', 'tail3', 'canary', 'release', 'guard1', 'trigger'];
+    // Role order comes from wave-roles.cjs (see the gate near the top of main).
     
     // FIXED TIMING:
     // canary: 1.7ms (must be pending when pin arrives at 2.0ms)
@@ -394,6 +398,9 @@ async function main() {
       
       if (role === 'release') steps.push(sleep(2000000));
       else if (role === 'guard1') steps.push(sleep(2400000));
+      else if (role === 'filler0') steps.push(sleep(2000000));
+      else if (role === 'filler1') steps.push(sleep(2150000));
+      else if (role === 'guard0') steps.push(wait(groupReleased));
       // Original upstream schedule: sample the spacing decision only after the
       // group is released, the guard has launched and the hole has finished.
       else if (role === 'trigger') steps.push(sleep(2400000), wait(groupReleased), wait(guardLaunched), sleep(400000),
@@ -419,7 +426,7 @@ async function main() {
       if (role === 'hole') steps.push(setByte(holeFinished, 1, 'holeFinished'), signal(holeDone));
       if (role === 'release') steps.push(signal(groupReleased));
       
-      if (['commit', 'tail0', 'tail1', 'tail2', 'tail3', 'canary'].includes(role))
+      if (['commit', 'tail0', 'tail1', 'tail2', 'tail3', 'canary', 'filler0', 'filler1', 'guard0'].includes(role))
         steps.push(setByte(completedFlag, 1, 'protectedRequestFinished'));
       
       return steps;
@@ -482,13 +489,14 @@ async function main() {
         {receive: [{address: output, size: readSize, mode: 1}]})];
       for (let i = 0; i < 4; i++) packets.push(pathPacket(1002, Buffer.alloc(0), tailInputs[i], pieces[i + 1].length));
       packets.push(pathPacket(7, Buffer.alloc(0), b + 0x40000, canarySize),
+        ...(fillerRoles ? [Buffer.from(fillerRequest), Buffer.from(fillerRequest)] : []),
         null, 
-        Buffer.from(guardRequest), 
+        ...(fillerRoles ? [Buffer.from(guardRequest)] : []), Buffer.from(guardRequest), 
         pathPacket(7, Buffer.alloc(0), triggerInput, 0x800));
       await s.measure('requests:' + profile, async () => {
         const writes = packets.flatMap((bytes, i) => bytes ? [{address: requests[i],
           bytes: context(bytes, i === 0 || i >= 2 && i < 6 ? 3 : 9)}] : []);
-        writes.push({address: requests[7], bytes: domain.wire.closeObject(group.outer)},
+        writes.push({address: requests[releaseIndex], bytes: domain.wire.closeObject(group.outer)},
           {address: preReleaseBuffer, bytes: context(packet(1009))},
           {address: clearReportBuffer, bytes: context(packet(1009))});
         writes.push({address: pinBuffer, bytes: context(packet(createPin ? 200 : 1009))});
@@ -544,7 +552,7 @@ async function main() {
       group.outer = null;
       group.objects.length = 0;
       const after = await memory(), trigger = rows.find(row => row.role === 'trigger');
-      const heldPaths = rows.filter(row => ['canary', 'guard1'].includes(row.role));
+      const heldPaths = rows.filter(row => ['canary', 'guard1', ...(fillerRoles ? ['filler0', 'filler1', 'guard0'] : [])].includes(row.role));
       const beforeRelease = rows.find(row => row.role === 'preRelease');
       const canaryRow = rows.find(row => row.role === 'canary');
       const overlap = qualifyOverlap(rows);

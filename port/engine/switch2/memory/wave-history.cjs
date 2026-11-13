@@ -69,9 +69,14 @@ function failureSummary(report, error) {
   let kind, message;
   if (worker?.observed === 'not-terminated' || /Native batch did not terminate/.test(text)) {
     kind = 'native-worker-timeout';
+    const where = worker?.stuckStep
+      ? 'stuck at step ' + worker.stuckStep.index + ' (' + worker.stuckStep.name + ') after ' +
+        worker.completedSteps + ' of ' + worker.steps + ' steps'
+      : 'executing step unknown';
     message = (active?.profile || 'native') + ': worker ' + (role || worker?.label || 'unknown') +
       ' did not terminate' + (worker?.timeoutMs ? ' within ' + worker.timeoutMs + 'ms' : '') +
-      '; executing step unknown; ' + unjoinedThreads + ' tracked unjoined threads';
+      '; ' + where + '; ' + unjoinedThreads + ' tracked unjoined threads' +
+      (worker?.unjoined?.length ? '; unjoined workers: ' + worker.unjoined.join(', ') : '');
   } else if (report.allocationMismatch) {
     kind = 'allocation-profile-mismatch'; message = text;
   } else if (/timed out|timeout/i.test(text)) {
