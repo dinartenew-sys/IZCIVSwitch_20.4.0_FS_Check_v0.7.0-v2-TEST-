@@ -1,5 +1,5 @@
 // Qualify the request lifetimes observed in one gap-probe wave.
-const HELD_ROLES = ['canary', 'filler0', 'filler1', 'guard0', 'guard1'];
+const HELD_ROLES = ['canary', 'guard1'];
 const THROUGH_ROLES = ['commit', 'tail0', 'tail1', 'tail2', 'tail3'];
 
 function qualifyOverlap(rows) {

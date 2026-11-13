@@ -6,9 +6,10 @@ and resources were released. Earlier FS attempts stalled during setup cloning,
 before any filesystem race wave or overwrite.
 
 This package applies that connection-management approach to the full FS check.
-The complete setup needs ten clones and thirteen distinct sessions. That larger
-layout still needs hardware validation: v0.6.3 reached eleven owned FS handles
-and does not establish a firmware limit. The full port remains unverified.
+The compact setup needs seven clones and ten distinct sessions, with ten
+concurrent native roles. That layout still needs hardware validation: v0.6.3
+reached eleven owned FS handles and does not establish a firmware limit. The
+full port remains unverified.
 
 ## Run
 

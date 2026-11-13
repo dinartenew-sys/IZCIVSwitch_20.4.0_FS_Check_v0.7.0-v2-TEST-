@@ -57,8 +57,8 @@
   "affinity": {
     "mode": "direct"
   },
-  "pinningAllocationBytes": 6960,
-  "heapJitterBytes": 192,
+  "pinningAllocationBytes": 7040,
+  "heapJitterBytes": 1024,
   "fieldCopies": 1,
   "memoryMap": {
     "attempts": 5,

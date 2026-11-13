@@ -122,7 +122,7 @@ async function startLoader(host,payload,onLine) {
 }
 async function runChild(directory,append) {
   const env={...process.env,NS2_TARGET:'civ7',NS2_PORT_ROOT:path.join(ROOT,'port'),NS2_TARGET_ROOT:directory};
-  for(const k of Object.keys(env))if(k.startsWith('NS2_')&&!['NS2_TARGET','NS2_PORT_ROOT','NS2_TARGET_ROOT'].includes(k))delete env[k];
+  for(const k of Object.keys(env))if(k.startsWith('NS2_')&&!['NS2_TARGET','NS2_PORT_ROOT','NS2_TARGET_ROOT','NS2_DIAG_TRIGGER_EARLY','NS2_DIAG_TRIGGER_SOURCE'].includes(k))delete env[k];
   const child=spawn(process.execPath,[path.join(directory,'switch2/fs-check.cjs')],
     {cwd:directory,env,windowsHide:true,stdio:['ignore','pipe','pipe']});
   return new Promise((resolve,reject)=>{
@@ -186,12 +186,12 @@ async function main(args=process.argv.slice(2)) {
   } catch(e) {result.error=e.stack;}
   finally {
     result.cleanupErrors=[];
-    if(bridge)try{await bridge.close();}catch(e){result.cleanupErrors.push(e.message);}
-    if(native)try{await native.stop();}catch(e){result.cleanupErrors.push(e.message);}
+    if(bridge)try{await bridge.close();}catch(e){result.cleanupErrors.push('bridge close: '+e.message);}
+    if(native)try{await native.stop();}catch(e){result.cleanupErrors.push('native stop: '+e.message);}
     else if(rpcConnection)rpcConnection.close();
     if(loader) {
       try{await loader.wait(()=>!!loader.bridgeReport,10000,'Console bridge cleanup');}
-      catch(e){result.cleanupErrors.push(e.message);}
+      catch(e){result.cleanupErrors.push('loader bridge report: '+e.message);}
       result.sdk=loader.sdk;result.bridge=loader.bridgeReport;
       loader.socket.destroy();
     }

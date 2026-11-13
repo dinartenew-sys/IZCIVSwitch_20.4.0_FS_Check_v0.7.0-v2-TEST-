@@ -84,11 +84,11 @@ test('the actual acquisition stops a blocked clone before any scratch path opera
   assert.equal(snapshot.retained.base,0x30000000);assert.equal(snapshot.retained.handles.length,3);
   assert.ok(snapshot.workerCaptureSkipped);assert.ok(snapshot.error.includes('did not terminate'));
 });
-test('the actual acquisition reaches its first scratch write only after all thirteen sessions qualify',async()=>{
+test('the actual acquisition reaches its first scratch write only after all ten sessions qualify',async()=>{
   const {snapshot,handlesAtScratch,cleanups}=await runProbeSetup('success');
-  assert.equal(handlesAtScratch.length,13);assert.equal(new Set(handlesAtScratch).size,13);
+  assert.equal(handlesAtScratch.length,10);assert.equal(new Set(handlesAtScratch).size,10);
   assert.equal(handlesAtScratch.includes(4),false);
-  assert.equal(snapshot.cloneTopology.clones.length,10);assert.equal(snapshot.cloneMonitor.cleanedUp,true);
+  assert.equal(snapshot.cloneTopology.clones.length,7);assert.equal(snapshot.cloneMonitor.cleanedUp,true);
   assert.ok(snapshot.error.includes('SCRATCH_TEST_BOUNDARY'));assert.equal(snapshot.cleanedUp,true);
   assert.equal(cleanups,1);
 });

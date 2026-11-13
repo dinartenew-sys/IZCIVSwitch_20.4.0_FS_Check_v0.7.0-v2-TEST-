@@ -8,8 +8,15 @@ bridge and the pinned upstream race, geometry and restoration controls.
 - Reuse the base save handle for commit. Host operations finish before waves.
 - Alias temporary=save for serial host operations; share the trigger only across
   sequential wave types. Concurrent roles retain distinct connections.
-- Build the full thirteen-session setup with ten clones before scratch writes.
-  The previous successful diagnostic tested eight clones and eleven handles.
+- Build a compact ten-session setup with seven clones (four tails, canary, guard1,
+  trigger) before scratch writes. It drops the original filler0, filler1 and
+  guard0 roles and the extra saved/temporary clones of the upstream layout. The
+  previous successful diagnostic tested eight clones and eleven handles.
+- Canary delay 1.7 ms, before the pin at 2.0 ms (upstream ordering). The pinning
+  check requires the canary to start first; a 2.2 ms canary failed it on every
+  retry of the 2026-11-13 hardware run.
+- Pinning allocation cost 7040 bytes, the value measured on this console. Set in
+  target.civ7.json; the upstream Civ7 value was 6960.
 - Monitor clone and pointer-buffer controls using a separate one-MiB allocation
   and the tested event/frame/stack layout, with scheduling borrowed from live
   game threads. Read replies only after kernel termination. Returned handles

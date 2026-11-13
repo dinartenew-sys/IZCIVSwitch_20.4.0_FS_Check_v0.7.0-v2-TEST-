@@ -25,13 +25,13 @@ Offline validation covers 50 tests:
 - Monitored controls: reads only after join, handle ownership, pending and
   uncertain-launch retention, refused-launch cleanup, transport failures and
   rejection of unowned sources or unsupported controls.
-- Compact setup: ten clones, thirteen distinct sessions, separate concurrent
+- Compact setup: seven clones, ten distinct sessions, separate concurrent
   roles and rejection of duplicate handles.
 - Staged runtime imports without network access, including rejection when the
   memory/session.cjs dependency is removed.
 - Actual acquisition entrypoint with mocked native operations: blocked cloning
   causes no scratch path calls and retains resources. Successful full setup
-  reaches its first scratch write only after thirteen sessions qualify and the
+  reaches its first scratch write only after ten sessions qualify and the
   metadata copy and monitor are released.
 
 All CommonJS syntax is checked. Build-only stages/imports runtime dependencies

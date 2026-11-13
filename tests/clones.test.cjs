@@ -88,13 +88,22 @@ test('compact FS setup supplies separate sessions to every concurrent native rol
   let next=10;const calls=[];
   const r=await createClients({saved:1,root:2,storage:3,base:0x40000000,
     clone:async(source,label)=>{calls.push({source,label});return next++;}});
-  assert.equal(calls.length,10);assert.deepEqual(calls.map(c=>c.source),[2,2,2,2,1,1,1,1,1,1]);
-  assert.equal(r.clients[0],1);assert.equal(r.clients[1],3);assert.equal(r.clients.length,13);
-  assert.deepEqual(r.clients[9],{u32:0x40002a00});assert.deepEqual(r.clients[12],{u32:0x40002a04});
+  assert.equal(calls.length,7);assert.deepEqual(calls.map(c=>c.source),[2,2,2,2,1,1,1]);
+  assert.equal(r.clients[0],1);assert.equal(r.clients[1],3);assert.equal(r.clients.length,10);
+  assert.deepEqual(r.clients[7],{u32:0x40002a00});assert.deepEqual(r.clients[9],{u32:0x40002a04});
   const concurrent=[...r.clients.filter(Number.isInteger),r.savedTrigger];
-  assert.equal(new Set(concurrent).size,12);assert.equal(concurrent.includes(2),false);
-  assert.equal(r.tmpTrigger,r.savedTrigger);assert.equal(r.report.requiredSetupSessions,13);
+  assert.equal(new Set(concurrent).size,9);assert.equal(concurrent.includes(2),false);
+  assert.equal(r.tmpTrigger,r.savedTrigger);assert.equal(r.report.requiredSetupSessions,10);
 });
 test('compact setup rejects an alias between concurrent sessions',async()=>{
   await assert.rejects(createClients({saved:1,root:2,storage:3,base:0x40000000,clone:async()=>1}),/distinct/);
+});
+test('diagnostic trigger source can come from the root without adding a session',async()=>{
+  let next=20;const calls=[];
+  const r=await createClients({saved:1,root:2,storage:3,base:0x40000000,triggerFrom:'root',
+    clone:async(source,label)=>{calls.push({source,label});return next++;}});
+  assert.equal(calls.length,7);assert.deepEqual(calls.map(c=>c.source),[2,2,2,2,1,1,1].slice(0,6).concat([2]));
+  assert.equal(r.report.triggerSource,'root');assert.equal(r.report.clones.length,7);
+  assert.equal(new Set([1,2,3,...r.report.clones.map(c=>c.handle)]).size,10);
+  await assert.rejects(createClients({saved:1,root:2,storage:3,base:0x40000000,triggerFrom:'other',clone:async()=>1}),/Unsupported/);
 });

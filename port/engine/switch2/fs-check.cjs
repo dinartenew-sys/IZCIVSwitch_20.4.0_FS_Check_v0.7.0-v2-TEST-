@@ -43,7 +43,7 @@ function summarize(report){
     'placementUncertain','failureSummary','freeSpace','storageSize','workerDelaysNs','pinRetries',
     'qualifiedReadSize','markerSelected','markerReproduced','canaryChanged','serveSkipped',
     'cacheAddress','cacheAlias','originalRom','scratchWritesStarted','cloneTopology','cloneMonitor',
-    'cloneMonitorCleanupError','workerCaptureSkipped'];
+    'cloneMonitorCleanupError','workerCaptureSkipped','diagTriggerEarly'];
   const summary=Object.fromEntries(keys.filter(k=>k in report).map(k=>[k,report[k]]));
   summary.caseCount=report.cases?.length||0;
   summary.lastCases=(report.cases||[]).slice(-3).map(row=>Object.fromEntries(
